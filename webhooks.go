@@ -1,0 +1,59 @@
+package blockcy
+
+import (
+	"bytes"
+	"encoding/json"
+)
+
+//ListHooks returns a slice of WebHooks associated
+//with your Config.Token.
+func ListHooks() (hooks []WebHook, err error) {
+	u, err := buildURL("/hooks")
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//decode JSON into hooks
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&hooks)
+	return
+}
+
+//PostHook creates a new WebHook associated
+//with your Config.Token, and returns a result
+//WebHook with a BlockCypher-assigned Id.
+func PostHook(hook WebHook) (result WebHook, err error) {
+	u, err := buildURL("/hooks")
+	if err != nil {
+		return
+	}
+	//encode response into ReadWriter
+	var data bytes.Buffer
+	enc := json.NewEncoder(&data)
+	if err = enc.Encode(&hook); err != nil {
+		return
+	}
+	resp, err := postResponse(u, &data)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//Decode JSON into result
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&result)
+	return
+}
+
+//DeleteHook deletes a WebHook notification
+//from BlockCypher's database, based on its
+//Id field.
+func DeleteHook(hook WebHook) (err error) {
+	u, err := buildURL("/hooks/" + hook.Id)
+	resp, err := deleteResponse(u)
+	if err != nil {
+		return
+	}
+	resp.Body.Close()
+	return
+}
