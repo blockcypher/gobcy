@@ -109,7 +109,7 @@ type AddrPair struct {
 	Address string `json:"address"`
 	Private string `json:"private"`
 	Public  string `json:"public"`
-	WIF     string `json:"wif"`
+	Wif     string `json:"wif"`
 }
 
 //WebHook represents a WebHook event. You can include
