@@ -43,13 +43,12 @@ func SkelMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int,
 	scripttype := "multisig-" + strconv.Itoa(n) + "-of-" + strconv.Itoa(m)
 	trans.Inputs = make([]TXInput, 1)
 	trans.Outputs = make([]TXOutput, 1)
-	if outAddr != "" {
+	if inAddr != "" {
 		trans.Inputs[0].Addresses = make([]string, 1)
 		trans.Inputs[0].Addresses[0] = inAddr
 		trans.Outputs[0].Addresses = pubkeys
 		trans.Outputs[0].ScriptType = scripttype
-	}
-	if inAddr != "" {
+	} else if outAddr != "" {
 		trans.Inputs[0].Addresses = pubkeys
 		trans.Inputs[0].ScriptType = scripttype
 		trans.Outputs[0].Addresses = make([]string, 1)

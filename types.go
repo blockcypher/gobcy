@@ -81,7 +81,7 @@ type TXInput struct {
 type TXOutput struct {
 	SpentBy    string   `json:"spent_by,omitempty"`
 	Value      int      `json:"value"`
-	Addresses  []string `json:"addresses,omitempty"`
+	Addresses  []string `json:"addresses"`
 	ScriptType string   `json:"script_type,omitempty"`
 	Script     string   `json:"script,omitempty"`
 }
