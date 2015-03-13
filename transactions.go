@@ -90,7 +90,7 @@ func NewTX(trans TX) (wip WipTX, err error) {
 //network. WipTX requires a fully formed TX, Signatures,
 //and PubKeys. PubKeys should not be included in the
 //special case of multi-sig addresses.
-func SendTX(wip WipTX) (trans TX, err error) {
+func SendTX(wip WipTX) (trans WipTX, err error) {
 	u, err := buildURL("/txs/send")
 	if err != nil {
 		return
@@ -114,7 +114,7 @@ func SendTX(wip WipTX) (trans TX, err error) {
 
 //PushTX takes a hex-encoded transaction string
 //and pushes it directly to the Coin/Chain network.
-func PushTX(hex string) (trans TX, err error) {
+func PushTX(hex string) (trans WipTX, err error) {
 	u, err := buildURL("/txs/push")
 	if err != nil {
 		return
@@ -139,8 +139,8 @@ func PushTX(hex string) (trans TX, err error) {
 //DecodeTX takes a hex-encoded transaction string
 //and decodes it into a TX object, without sending
 //it along to the Coin/Chain network.
-func DecodeTX(hex string) (trans TX, err error) {
-	u, err := buildURL("/txs/push")
+func DecodeTX(hex string) (trans WipTX, err error) {
+	u, err := buildURL("/txs/decode")
 	if err != nil {
 		return
 	}
