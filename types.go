@@ -169,9 +169,9 @@ type Payback struct {
 type WipTX struct {
 	Errors     []wipTXerr `json:"errors,omitempty"`
 	Trans      TX         `json:"tx"`
-	ToSign     []string   `json:"tosign,omitempty"`
-	Signatures []string   `json:"signatures,omitempty"`
-	PubKeys    []string   `json:"pubkeys"`
+	ToSign     []string   `json:"tosign"`
+	Signatures []string   `json:"signatures"`
+	PubKeys    []string   `json:"pubkeys,omitempty"`
 }
 
 //used within WipTX for JSON serialization.
