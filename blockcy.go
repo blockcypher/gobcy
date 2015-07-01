@@ -1,7 +1,7 @@
 //Pacakge blockcy implements a wrapper for the http://blockcypher.com API.
-//You can use it to query addresses, transactions, and blocks from the bitcoin
-//main and test3 chains, and the BlockCypher test chain (other blockchains currently
-//not supported.)
+//You can use it to interact with addresses, transactions, and blocks from
+//various blockchains, including Bitcoin's main and test3 chains,
+//and the BlockCypher test chain.
 package blockcy
 
 import (
@@ -13,17 +13,20 @@ import (
 )
 
 const (
-	BlockURL = "https://api.blockcypher.com/v1/"
+	BaseURL = "https://api.blockcypher.com/v1/"
 )
 
-//Config stores your BlockCypher Token, and the coin/chain
-//you're querying. This wrapper currently only supports the "btc" and "bcy"
-//coins and their respective chains ("main", "test3", and "test").
-//Update them in your code like so:
-//	blockcy.Config.Token = "your-api-token"
-//	blockcy.Config.Coin = "btc"
-//	blockcy.Config.Chain = "main"
-var Config struct {
+//API stores your BlockCypher Token, and the coin/chain
+//you're querying. Coins can be "btc","bcy","ltc", and "doge".
+//Chains can be "main", "test3", or "test", depending on the Coin.
+//Check http://dev.blockcypher.com/ for more information.
+//All your credentials are stored within an API struct, as are
+//many of the API methods.
+//You can allocate an API struct like so:
+//	bc = blockcy.API{"your-api-token","btc","main"}
+//Then query as you like:
+//	chain = bc.GetChain()
+type API struct {
 	Token, Coin, Chain string
 }
 
@@ -80,25 +83,25 @@ func deleteResponse(target *url.URL) (resp *http.Response, err error) {
 }
 
 //constructs BlockCypher URLs for requests
-func buildURL(u string) (target *url.URL, err error) {
-	target, err = url.Parse(BlockURL + Config.Coin +
-		"/" + Config.Chain + u)
+func (self *API) buildURL(u string) (target *url.URL, err error) {
+	target, err = url.Parse(BaseURL + self.Coin +
+		"/" + self.Chain + u)
 	if err != nil {
 		return
 	}
 	//add token to url, if present
-	if Config.Token != "" {
+	if self.Token != "" {
 		values := target.Query()
-		values.Set("token", Config.Token)
+		values.Set("token", self.Token)
 		target.RawQuery = values.Encode()
 	}
 	return
 }
 
 //constructs BlockCypher URLs with parameters for requests
-func buildURLParams(u string, params map[string]string) (target *url.URL, err error) {
-	target, err = url.Parse(BlockURL + Config.Coin +
-		"/" + Config.Chain + u)
+func (self *API) buildURLParams(u string, params map[string]string) (target *url.URL, err error) {
+	target, err = url.Parse(BaseURL + self.Coin +
+		"/" + self.Chain + u)
 	if err != nil {
 		return
 	}
@@ -108,8 +111,8 @@ func buildURLParams(u string, params map[string]string) (target *url.URL, err er
 		values.Set(k, v)
 	}
 	//add token to url, if present
-	if Config.Token != "" {
-		values.Set("token", Config.Token)
+	if self.Token != "" {
+		values.Set("token", self.Token)
 	}
 	target.RawQuery = values.Encode()
 	return
