@@ -1,6 +1,6 @@
 # blockcy
 
-A Go wrapper for the [BlockCypher](http://blockcypher.com/) API. Targeting support for Bitcoin (main and testnet3) and BlockCypher's internal testnet.
+A Go wrapper for the [BlockCypher](http://blockcypher.com/) API. Targeting support for Bitcoin (main and testnet3) and BlockCypher's internal testnet, but others (Litecoin, Dogecoin) should work too.
 
 ## Configuration
 
@@ -10,12 +10,20 @@ Import the package like so:
 import "github.com/acityinohio/blockcy"
 ```
 
-Then set your configuration variables:
+Then initiate an API struct with your credentials:
 
 ```go
-blockcy.Config.Coin = "btc" //only supports "btc" or "bcy"
-blockcy.Config.Chain = "main"
-blockcy.Config.Token = "your-api-token-here"
+//explicit
+bc := blockcy.API
+bc.Token = "your-api-token-here"
+bc.Coin = "btc" //options: "btc","bcy","ltc","doge"
+bc.Chain = "main" //depending on coin: "main","test3","test"
+
+//using a struct literal
+bc := blockcy.API{"your-api-token-here","btc","main"}
+
+//query away
+fmt.Println(bc.GetChain())
 ```
 
 ## Usage
