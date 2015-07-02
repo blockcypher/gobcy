@@ -59,7 +59,8 @@ func (self *API) GenAddrPair() (pair AddrPair, err error) {
 }
 
 //Faucet funds the AddrPair with an amount. Only works on BlockCypher's
-//Testnet and Bitcoin Testnet3.
+//Testnet and Bitcoin Testnet3. Returns the transaction hash funding
+//your AddrPair.
 func (self *API) Faucet(a AddrPair, amount int) (txhash string, err error) {
 	if (self.Coin != "bcy" && self.Chain != "test") || (self.Coin != "btc" && self.Chain != "test3") {
 		err = errors.New("Faucet: Cannot use Faucet unless on BlockCypher Testnet or Bitcoin Testnet3.")

@@ -63,8 +63,8 @@ func SkelMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int,
 
 //NewTX takes a partially formed TX and returns
 //a WipTX with the data that needs to be signed.
-func NewTX(trans TX) (wip WipTX, err error) {
-	u, err := buildURL("/txs/new")
+func (self *API) NewTX(trans TX) (wip WipTX, err error) {
+	u, err := self.buildURL("/txs/new")
 	if err != nil {
 		return
 	}
@@ -90,8 +90,8 @@ func NewTX(trans TX) (wip WipTX, err error) {
 //network. WipTX requires a fully formed TX, Signatures,
 //and PubKeys. PubKeys should not be included in the
 //special case of multi-sig addresses.
-func SendTX(wip WipTX) (trans WipTX, err error) {
-	u, err := buildURL("/txs/send")
+func (self *API) SendTX(wip WipTX) (trans WipTX, err error) {
+	u, err := self.buildURL("/txs/send")
 	if err != nil {
 		return
 	}
@@ -114,8 +114,8 @@ func SendTX(wip WipTX) (trans WipTX, err error) {
 
 //PushTX takes a hex-encoded transaction string
 //and pushes it directly to the Coin/Chain network.
-func PushTX(hex string) (trans WipTX, err error) {
-	u, err := buildURL("/txs/push")
+func (self *API) PushTX(hex string) (trans WipTX, err error) {
+	u, err := self.buildURL("/txs/push")
 	if err != nil {
 		return
 	}
@@ -139,8 +139,8 @@ func PushTX(hex string) (trans WipTX, err error) {
 //DecodeTX takes a hex-encoded transaction string
 //and decodes it into a TX object, without sending
 //it along to the Coin/Chain network.
-func DecodeTX(hex string) (trans WipTX, err error) {
-	u, err := buildURL("/txs/decode")
+func (self *API) DecodeTX(hex string) (trans WipTX, err error) {
+	u, err := self.buildURL("/txs/decode")
 	if err != nil {
 		return
 	}
@@ -166,8 +166,8 @@ func DecodeTX(hex string) (trans WipTX, err error) {
 //if it successfully sent. If using public (instead of
 //private) keys, you'll need to sign the returned Micro
 //and run SendMicro again until you will get a hash.
-func SendMicro(mic Micro) (result Micro, err error) {
-	u, err := buildURL("/txs/micro")
+func (self *API) SendMicro(mic Micro) (result Micro, err error) {
+	u, err := self.buildURL("/txs/micro")
 	if err != nil {
 		return
 	}
