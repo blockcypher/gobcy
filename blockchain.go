@@ -9,8 +9,8 @@ import (
 
 //GetChain returns the current state of the
 //configured Coin/Chain.
-func GetChain() (chain Chain, err error) {
-	u, err := buildURL("")
+func (self *API) GetChain() (chain Chain, err error) {
+	u, err := self.buildURL("")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -25,8 +25,8 @@ func GetChain() (chain Chain, err error) {
 //GetBlock returns a Block based on either height
 //or hash. If both height and hash are sent, it will
 //throw an error.
-func GetBlock(height int, hash string) (block Block, err error) {
-	block, err = GetBlockPage(height, hash, 0, 0)
+func (self *API) GetBlock(height int, hash string) (block Block, err error) {
+	block, err = self.GetBlockPage(height, hash, 0, 0)
 	return
 }
 
@@ -34,7 +34,7 @@ func GetBlock(height int, hash string) (block Block, err error) {
 //or hash, and includes custom variables for txstart/limit of txs.
 //If both height and hash are sent, it will throw an error. If txstart/limit = 0,
 //it will use the API-defaults for both.
-func GetBlockPage(height int, hash string, txstart int, limit int) (block Block, err error) {
+func (self *API) GetBlockPage(height int, hash string, txstart int, limit int) (block Block, err error) {
 	var u *url.URL
 	ustr := "/blocks/"
 	if height != 0 && hash != "" {
@@ -46,13 +46,13 @@ func GetBlockPage(height int, hash string, txstart int, limit int) (block Block,
 		ustr = ustr + hash
 	}
 	if txstart == 0 && limit == 0 {
-		u, err = buildURL(ustr)
+		u, err = self.buildURL(ustr)
 	} else {
 		params := map[string]string{
 			"txstart": strconv.Itoa(txstart),
 			"limit":   strconv.Itoa(limit),
 		}
-		u, err = buildURLParams(ustr, params)
+		u, err = self.buildURLParams(ustr, params)
 	}
 	resp, err := getResponse(u)
 	if err != nil {
@@ -66,8 +66,8 @@ func GetBlockPage(height int, hash string, txstart int, limit int) (block Block,
 }
 
 //GetUnTX returns an array of the latest unconfirmed TXs.
-func GetUnTX() (txs []TX, err error) {
-	u, err := buildURL("/txs")
+func (self *API) GetUnTX() (txs []TX, err error) {
+	u, err := self.buildURL("/txs")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -80,8 +80,8 @@ func GetUnTX() (txs []TX, err error) {
 }
 
 //GetTX returns a TX represented by the passed hash.
-func GetTX(hash string) (tx TX, err error) {
-	u, err := buildURL("/txs/" + hash)
+func (self *API) GetTX(hash string) (tx TX, err error) {
+	u, err := self.buildURL("/txs/" + hash)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -95,10 +95,10 @@ func GetTX(hash string) (tx TX, err error) {
 
 //GetTXConf returns a float [0,1] representing BlockCypher's
 //confidence that an unconfirmed transaction will be confirmed
-//in the next block. Returns an error if the transaction has
+//in the next block. If it returns a 1, the transaction has
 //already been confirmed.
-func GetTXConf(hash string) (conf float64, err error) {
-	u, err := buildURL("/txs/" + hash + "/confidence")
+func (self *API) GetTXConf(hash string) (conf float64, err error) {
+	u, err := self.buildURL("/txs/" + hash + "/confidence")
 	resp, err := getResponse(u)
 	if err != nil {
 		return

@@ -2,7 +2,7 @@ package blockcy
 
 import "time"
 
-//Chain represents information about
+//Blockchain represents information about
 //the state of a blockchain.
 type Chain struct {
 	Name             string    `json:"name"`

@@ -9,8 +9,8 @@ import (
 
 //GetAddr returns balance information for a given public
 //address. Does not include transaction details.
-func GetAddr(hash string) (addr Addr, err error) {
-	u, err := buildURL("/addrs/" + hash + "/balance")
+func (self *API) GetAddr(hash string) (addr Addr, err error) {
+	u, err := self.buildURL("/addrs/" + hash + "/balance")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -27,9 +27,9 @@ func GetAddr(hash string) (addr Addr, err error) {
 //with this address. Takes an additional parameter "unspent."
 //If true, unspent will only return transactions with unspent
 //outputs (UTXO).
-func GetAddrFull(hash string, unspent bool) (addr Addr, err error) {
+func (self *API) GetAddrFull(hash string, unspent bool) (addr Addr, err error) {
 	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent)}
-	u, err := buildURLParams("/addrs/"+hash+"/full", params)
+	u, err := self.buildURLParams("/addrs/"+hash+"/full", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -45,8 +45,8 @@ func GetAddrFull(hash string, unspent bool) (addr Addr, err error) {
 //transactions within the specified coin/chain. Please note that
 //this call must be made over SSL, and it is not recommended to keep
 //large amounts in these addresses, or for very long.
-func GenAddrPair() (pair AddrPair, err error) {
-	u, err := buildURL("/addrs")
+func (self *API) GenAddrPair() (pair AddrPair, err error) {
+	u, err := self.buildURL("/addrs")
 	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
@@ -59,17 +59,17 @@ func GenAddrPair() (pair AddrPair, err error) {
 }
 
 //Faucet funds the AddrPair with an amount. Only works on BlockCypher's
-//testnet, where Config.Coin = "bcy" and Config.Chain = "test."
-func (a *AddrPair) Faucet(amount int) (txhash string, err error) {
-	if Config.Coin != "bcy" && Config.Chain != "test" {
-		err = errors.New("Faucet: Cannot use Faucet unless on BlockCypher testnet.")
+//Testnet and Bitcoin Testnet3.
+func (self *API) Faucet(a AddrPair, amount int) (txhash string, err error) {
+	if (self.Coin != "bcy" && self.Chain != "test") || (self.Coin != "btc" && self.Chain != "test3") {
+		err = errors.New("Faucet: Cannot use Faucet unless on BlockCypher Testnet or Bitcoin Testnet3.")
 		return
 	}
 	if amount > 1e7 {
 		err = errors.New("Faucet: Cannot fund with more than 10,000,000 coins at a time.")
 		return
 	}
-	u, err := buildURL("/faucet")
+	u, err := self.buildURL("/faucet")
 	if err != nil {
 		return
 	}
