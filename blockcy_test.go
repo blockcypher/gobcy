@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 	bcy.Coin = "bcy"
 	bcy.Chain = "test"
 	//Set Your Token
-	bcy.Token = ""
+	bcy.Token = "test-token"
 	//Create/fund the wallets
 	var err error
 	Wallet1, err = bcy.GenAddrPair()
