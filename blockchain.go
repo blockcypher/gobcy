@@ -9,7 +9,7 @@ import (
 
 //GetChain returns the current state of the
 //configured Coin/Chain.
-func (self *API) GetChain() (chain Chain, err error) {
+func (self *API) GetChain() (chain Blockchain, err error) {
 	u, err := self.buildURL("")
 	resp, err := getResponse(u)
 	if err != nil {

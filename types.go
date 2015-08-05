@@ -4,7 +4,7 @@ import "time"
 
 //Blockchain represents information about
 //the state of a blockchain.
-type Chain struct {
+type Blockchain struct {
 	Name             string    `json:"name"`
 	Height           int       `json:"height"`
 	Hash             string    `json:"hash"`
@@ -13,6 +13,9 @@ type Chain struct {
 	PrevHash         string    `json:"previous_hash"`
 	PrevURL          string    `json:"previous_url"`
 	PeerCount        int       `json:"peer_count"`
+	HighFee          int       `json:"high_fee_per_kb"`
+	MediumFee        int       `json:"medium_fee_per_kb"`
+	LowFee           int       `json:"low_fee_per_kb"`
 	UnconfirmedCount int       `json:"unconfirmed_count"`
 	LastForkHeight   int       `json:"last_fork_height"`
 	LastForkHash     string    `json:"last_fork_hash"`
@@ -30,6 +33,7 @@ type Block struct {
 	Ver          int       `json:"ver"`
 	Time         time.Time `json:"time"`
 	ReceivedTime time.Time `json:"received_time"`
+	RelayedBy    string    `json:"relayed_by,omitempty"`
 	Bits         int       `json:"bits"`
 	Nonce        int       `json:"nonce"`
 	NumTX        int       `json:"n_tx"`
@@ -49,19 +53,24 @@ type TX struct {
 	Addresses     []string   `json:"addresses,omitempty"`
 	Total         int        `json:"total,omitempty"`
 	Fees          int        `json:"fees,omitempty"`
+	Size          int        `json:"size"`
+	Preference    string     `json:"preference,omitempty"`
 	RelayedBy     string     `json:"relayed_by,omitempty"`
 	Received      time.Time  `json:"received,omitempty"`
 	Confirmed     time.Time  `json:"confirmed,omitempty"`
 	Confirmations int        `json:"confirmations,omitempty"`
 	Confidence    float64    `json:"confidence,omitempty"`
-	Preference    string     `json:"preference,omitempty"`
 	Ver           int        `json:"ver,omitempty"`
 	LockTime      int        `json:"lock_time,omitempty"`
 	DoubleSpend   bool       `json:"double_spend,omitempty"`
-	DoubleSpendTX string     `json:"double_spend_tx,omitempty"`
+	DoubleOf      string     `json:"double_of,omitempty"`
 	ReceiveCount  int        `json:"receive_count,omitempty"`
 	VinSize       int        `json:"vin_sz,omitempty"`
 	VoutSize      int        `json:"vout_sz,omitempty"`
+	Hex           string     `json:"hex,omitempty"`
+	ChangeAddress string     `json:"change_address,omitempty"`
+	NextInputs    string     `json:"next_inputs,omitempty"`
+	NextOutputs   string     `json:"next_outputs,omitempty"`
 	Inputs        []TXInput  `json:"inputs"`
 	Outputs       []TXOutput `json:"outputs"`
 }
@@ -75,6 +84,9 @@ type TXInput struct {
 	Sequence    int      `json:"sequence,omitempty"`
 	ScriptType  string   `json:"script_type,omitempty"`
 	Script      string   `json:"script,omitempty"`
+	Age         int      `json:"age,omitempty"`
+	WalletName  string   `json:"wallet_name,omitempty"`
+	WalletToken string   `json:"wallet_token,omitempty"`
 }
 
 //TXOutput represents the state of a transaction output
