@@ -98,6 +98,15 @@ type TXOutput struct {
 	Script     string   `json:"script,omitempty"`
 }
 
+//TXConf represents information about the
+//confidence of an unconfirmed transaction.
+type TXConf struct {
+	Age          int     `json:"age_millis"`
+	ReceiveCount int     `json:"receive_count,omitempty"`
+	Confidence   float64 `json:"confidence"`
+	TXHash       string  `json:"txhash"`
+}
+
 //Addr represents information about the state
 //of a public address.
 type Addr struct {
