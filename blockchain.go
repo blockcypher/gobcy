@@ -38,7 +38,7 @@ func (self *API) GetBlockPage(height int, hash string, txstart int, limit int) (
 	var u *url.URL
 	ustr := "/blocks/"
 	if height != 0 && hash != "" {
-		err = errors.New("Func GetBlock: Cannot send both height and hash")
+		err = errors.New("Func GetBlockPage: Cannot send both height and hash")
 		return
 	} else if height != 0 {
 		ustr = ustr + strconv.Itoa(height)
@@ -62,52 +62,5 @@ func (self *API) GetBlockPage(height int, hash string, txstart int, limit int) (
 	//decode JSON into Block
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&block)
-	return
-}
-
-//GetUnTX returns an array of the latest unconfirmed TXs.
-func (self *API) GetUnTX() (txs []TX, err error) {
-	u, err := self.buildURL("/txs")
-	resp, err := getResponse(u)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	//decode JSON into []TX
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&txs)
-	return
-}
-
-//GetTX returns a TX represented by the passed hash.
-func (self *API) GetTX(hash string) (tx TX, err error) {
-	u, err := self.buildURL("/txs/" + hash)
-	resp, err := getResponse(u)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	//decode JSON into TX
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&tx)
-	return
-}
-
-//GetTXConf returns a float [0,1] representing BlockCypher's
-//confidence that an unconfirmed transaction will be confirmed
-//in the next block. If it returns a 1, the transaction has
-//already been confirmed.
-func (self *API) GetTXConf(hash string) (conf float64, err error) {
-	u, err := self.buildURL("/txs/" + hash + "/confidence")
-	resp, err := getResponse(u)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	//decode JSON into map[string]interface{} then float
-	result := make(map[string]interface{})
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&result)
-	conf = result["confidence"].(float64)
 	return
 }

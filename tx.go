@@ -7,6 +7,53 @@ import (
 	"strconv"
 )
 
+//GetUnTX returns an array of the latest unconfirmed TXs.
+func (self *API) GetUnTX() (txs []TX, err error) {
+	u, err := self.buildURL("/txs")
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//decode JSON into []TX
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&txs)
+	return
+}
+
+//GetTX returns a TX represented by the passed hash.
+func (self *API) GetTX(hash string) (tx TX, err error) {
+	u, err := self.buildURL("/txs/" + hash)
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//decode JSON into TX
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&tx)
+	return
+}
+
+//GetTXConf returns a float [0,1] representing BlockCypher's
+//confidence that an unconfirmed transaction will be confirmed
+//in the next block. If it returns a 1, the transaction has
+//already been confirmed.
+func (self *API) GetTXConf(hash string) (conf float64, err error) {
+	u, err := self.buildURL("/txs/" + hash + "/confidence")
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//decode JSON into map[string]interface{} then float
+	result := make(map[string]interface{})
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&result)
+	conf = result["confidence"].(float64)
+	return
+}
+
 //SkelTX creates a skeleton transaction,
 //suitable for use in NewTX.
 func SkelTX(inAddr string, outAddr string, amount int, confirm bool) (trans TX) {
@@ -158,32 +205,5 @@ func (self *API) DecodeTX(hex string) (trans TXSkel, err error) {
 	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&trans)
-	return
-}
-
-//SendMicro sends a Micro through the Coin/Chain
-//network. It will return a Micro with a proper hash
-//if it successfully sent. If using public (instead of
-//private) keys, you'll need to sign the returned Micro
-//and run SendMicro again until you will get a hash.
-func (self *API) SendMicro(mic MicroTX) (result MicroTX, err error) {
-	u, err := self.buildURL("/txs/micro")
-	if err != nil {
-		return
-	}
-	//encode response into ReadWriter
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&mic); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	//Decode JSON into result
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&result)
 	return
 }
