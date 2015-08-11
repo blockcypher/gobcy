@@ -186,23 +186,26 @@ type MicroTX struct {
 //Addr represents information about the state
 //of a public address.
 type Addr struct {
-	Address            string `json:"address"`
-	TotalReceived      int    `json:"total_received"`
-	TotalSent          int    `json:"total_sent"`
-	Balance            int    `json:"balance"`
-	UnconfirmedBalance int    `json:"unconfirmed_balance"`
-	FinalBalance       int    `json:"final_balance"`
-	NumTX              int    `json:"n_tx"`
-	UnconfirmedNumTX   int    `json:"unconfirmed_n_tx"`
-	FinalNumTX         int    `json:"final_n_tx"`
-	TXs                []TX   `json:"txs"`
+	Address            string  `json:"address"`
+	TotalReceived      int     `json:"total_received"`
+	TotalSent          int     `json:"total_sent"`
+	Balance            int     `json:"balance"`
+	UnconfirmedBalance int     `json:"unconfirmed_balance"`
+	FinalBalance       int     `json:"final_balance"`
+	NumTX              int     `json:"n_tx"`
+	UnconfirmedNumTX   int     `json:"unconfirmed_n_tx"`
+	FinalNumTX         int     `json:"final_n_tx"`
+	TXs                []TX    `json:"txs,omitempty"`
+	TXRefs             []TXRef `json:"txrefs,omitempty"`
+	UnconfirmedTXRefs  []TXRef `json:"unconfirmed_txrefs,omitempty"`
+	HasMore            bool    `json:"hasMore,omitempty"`
 }
 
-//AddrPair represents information about a generated
+//AddrKeychain represents information about a generated
 //public-private key pair from BlockCypher's address
 //generation API. Large amounts are not recommended to be
 //stored with these addresses.
-type AddrPair struct {
+type AddrKeychain struct {
 	Address string `json:"address"`
 	Private string `json:"private"`
 	Public  string `json:"public"`

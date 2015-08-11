@@ -41,27 +41,27 @@ func (self *API) GetAddrFull(hash string, unspent bool) (addr Addr, err error) {
 	return
 }
 
-//GenAddrPair generates a public/private key pair for use with
+//GenAddrKeychain generates a public/private key pair for use with
 //transactions within the specified coin/chain. Please note that
 //this call must be made over SSL, and it is not recommended to keep
 //large amounts in these addresses, or for very long.
-func (self *API) GenAddrPair() (pair AddrPair, err error) {
+func (self *API) GenAddrKeychain() (pair AddrKeychain, err error) {
 	u, err := self.buildURL("/addrs")
 	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into AddrPair
+	//decode JSON into AddrKeychain
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&pair)
 	return
 }
 
-//Faucet funds the AddrPair with an amount. Only works on BlockCypher's
+//Faucet funds the AddrKeychain with an amount. Only works on BlockCypher's
 //Testnet and Bitcoin Testnet3. Returns the transaction hash funding
-//your AddrPair.
-func (self *API) Faucet(a AddrPair, amount int) (txhash string, err error) {
+//your AddrKeychain.
+func (self *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
 	if !(self.Coin == "bcy" && self.Chain == "test") && !(self.Coin == "btc" && self.Chain == "test3") {
 		err = errors.New("Faucet: Cannot use Faucet unless on BlockCypher Testnet or Bitcoin Testnet3.")
 		return

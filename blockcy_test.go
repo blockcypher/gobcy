@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var Wallet1, Wallet2 AddrPair
+var Wallet1, Wallet2 AddrKeychain
 var txhash1, txhash2 string
 var bcy API
 
@@ -18,8 +18,8 @@ func TestMain(m *testing.M) {
 	bcy.Token = "test-token"
 	//Create/fund the wallets
 	var err error
-	Wallet1, err = bcy.GenAddrPair()
-	Wallet2, err = bcy.GenAddrPair()
+	Wallet1, err = bcy.GenAddrKeychain()
+	Wallet2, err = bcy.GenAddrKeychain()
 	if err != nil {
 		log.Fatal("Error generating test wallets: ", err)
 	}
