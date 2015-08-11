@@ -150,7 +150,7 @@ func TestNewTX(t *testing.T) {
 }
 
 func TestMicro(t *testing.T) {
-	mic := Micro{Private: Wallet2.Private, ToAddr: Wallet1.Address, Value: 25000}
+	mic := MicroTX{Priv: Wallet2.Private, ToAddr: Wallet1.Address, Value: 25000}
 	result, err := bcy.SendMicro(mic)
 	if err != nil {
 		t.Error("Error encountered: ", err)

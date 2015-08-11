@@ -107,6 +107,82 @@ type TXConf struct {
 	TXHash       string  `json:"txhash"`
 }
 
+//TXRef represents summarized data about a
+//transaction input or output.
+type TXRef struct {
+	BlockHeight   int       `json:"block_height"`
+	TXHash        string    `json:"tx_hash"`
+	TXInputN      int       `json:"tx_input_n"`
+	TXOutputN     int       `json:"tx_output_n"`
+	Value         int       `json:"value"`
+	Pref          string    `json:"preference"`
+	Spent         bool      `json:"spent"`
+	DoubleSpend   bool      `json:"double_spend"`
+	DoubleOf      string    `json:"double_of,omitempty`
+	Confirmations int       `json:"confirmations"`
+	RefBalance    int       `json:"ref_balance,omitempty"`
+	Confidence    float64   `json:"confidence,omitempty"`
+	Confirmed     time.Time `json:"confirmed,omitempty"`
+	SpentBy       string    `json:"spent_by,omitempty"`
+	Received      time.Time `json:"received,omitempty"`
+	ReceivedCount int       `json:"received_count,omitempty"`
+}
+
+//TXSkel represents the return call to BlockCypher's
+//txs/new endpoint, and includes error information,
+//hex transactions that need to be signed, and space
+//for the signed transactions and associated public keys.
+type TXSkel struct {
+	Trans      TX          `json:"tx"`
+	ToSign     []string    `json:"tosign"`
+	Signatures []string    `json:"signatures"`
+	PubKeys    []string    `json:"pubkeys,omitempty"`
+	ToSignTX   []string    `json:"tosign_tx,omitempty"`
+	Errors     []txSkelErr `json:"errors,omitempty"`
+}
+
+//used within for JSON serialization.
+type txSkelErr struct {
+	Error string `json:"error,omitempty"`
+}
+
+//NullData represents the call and return to BlockCypher's
+//Data API, allowing you to embed up to 80 bytes into
+//a blockchain via an OP_RETURN.
+type NullData struct {
+	Data     string `json:"data"`
+	Token    string `json:"token,omitempty"`
+	Encoding string `json:"encoding,omitempty"`
+	Hash     string `json:"hash,omitempty"`
+}
+
+//MicroTX represents a microtransaction. For small-value
+//transactions, BlockCypher will sign the transaction
+//on your behalf, with your private key (if provided).
+//Setting a separate change address is recommended.
+//Where your application model allows it, consider
+//only using public keys with microtransactions,
+//and sign the microtransaction with your private key
+//(without sending to BlockCypher's server.
+type MicroTX struct {
+	//Only one of Pubkey/Private/Wif is required
+	Pubkey     string     `json:"from_pubkey,omitempty"`
+	Priv       string     `json:"from_private,omitempty"`
+	Wif        string     `json:"from_wif,omitempty"`
+	ToAddr     string     `json:"to_address"`
+	Value      int        `json:"value_satoshis"`
+	Token      string     `json:"token,omitempty"`
+	ChangeAddr string     `json:"change_address,omitempty"`
+	Wait       bool       `json:"wait_guarantee,omitempty"`
+	ToSign     []string   `json:"tosign,omitempty"`
+	Signatures []string   `json:"signatures,omitempty"`
+	Hash       string     `json:"hash,omitempty"`
+	Inputs     []TXInput  `json:"inputs,omitempty"`
+	Outputs    []TXOutput `json:"outputs,omitempty"`
+	Fees       int        `json:"fees,omitempty"`
+	Hash       string     `json:"hash,omitempty"`
+}
+
 //Addr represents information about the state
 //of a public address.
 type Addr struct {
@@ -181,43 +257,4 @@ type Payback struct {
 	DestHash    string `json:"transaction_hash"`
 	InputAddr   string `json:"input_address"`
 	InputHash   string `json:"input_transaction_hash"`
-}
-
-//WIPTX represents the return call to BlockCypher's
-//txs/new endpoint, and includes error information,
-//hex transactions that need to be signed, and space
-//for the signed transactions and associated public keys.
-type WipTX struct {
-	Errors     []wipTXerr `json:"errors,omitempty"`
-	Trans      TX         `json:"tx"`
-	ToSign     []string   `json:"tosign"`
-	Signatures []string   `json:"signatures"`
-	PubKeys    []string   `json:"pubkeys,omitempty"`
-}
-
-//used within WipTX for JSON serialization.
-type wipTXerr struct {
-	Error string `json:"error,omitempty"`
-}
-
-//Micro represents a microtransaction. For small-value
-//transactions, BlockCypher will sign the transaction
-//on your behalf, with your private key (if provided).
-//Setting a separate change address is recommended.
-//Where your application model allows it, consider
-//only using public keys with microtransactions,
-//and sign the microtransaction with your private key
-//(without sending to BlockCypher's server.
-type Micro struct {
-	//Only one of Pubkey/Private/Wif is required
-	Pubkey     string   `json:"from_pubkey,omitempty"`
-	Private    string   `json:"from_private,omitempty"`
-	Wif        string   `json:"from_wif,omitempty"`
-	ToAddr     string   `json:"to_address"`
-	ChangeAddr string   `json:"change_address,omitempty"`
-	Value      int      `json:"value_satoshis"`
-	Wait       bool     `json:"wait_guarantee,omitempty"`
-	ToSign     []string `json:"tosign,omitempty"`
-	Signatures []string `json:"signatures,omitempty"`
-	Hash       string   `json:"hash,omitempty"`
 }
