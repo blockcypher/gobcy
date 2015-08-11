@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var Wallet1, Wallet2 AddrKeychain
+var keys1, keys2 AddrKeychain
 var txhash1, txhash2 string
 var bcy API
 
@@ -14,17 +14,17 @@ func TestMain(m *testing.M) {
 	//Set Coin/Chain to BlockCypher testnet
 	bcy.Coin = "bcy"
 	bcy.Chain = "test"
-	//Set Your Token
+	//Set Token
 	bcy.Token = "test-token"
 	//Create/fund the wallets
 	var err error
-	Wallet1, err = bcy.GenAddrKeychain()
-	Wallet2, err = bcy.GenAddrKeychain()
+	keys1, err = bcy.GenAddrKeychain()
+	keys2, err = bcy.GenAddrKeychain()
 	if err != nil {
 		log.Fatal("Error generating test wallets: ", err)
 	}
-	txhash1, err = bcy.Faucet(Wallet1, 1e5)
-	txhash2, err = bcy.Faucet(Wallet2, 2e5)
+	txhash1, err = bcy.Faucet(keys1, 1e5)
+	txhash2, err = bcy.Faucet(keys2, 2e5)
 	if err != nil {
 		log.Fatal("Error funding test wallets: ", err)
 	}
@@ -85,7 +85,7 @@ func TestGetTXConf(t *testing.T) {
 }
 
 func TestGetAddr(t *testing.T) {
-	addr, err := bcy.GetAddr(Wallet1.Address)
+	addr, err := bcy.GetAddr(keys1.Address)
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
@@ -94,7 +94,7 @@ func TestGetAddr(t *testing.T) {
 }
 
 func TestGetAddrFull(t *testing.T) {
-	addr, err := bcy.GetAddrFull(Wallet2.Address, false)
+	addr, err := bcy.GetAddrFull(keys2.Address, false)
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
@@ -103,26 +103,25 @@ func TestGetAddrFull(t *testing.T) {
 }
 
 func TestHooks(t *testing.T) {
-	hook, err := bcy.PostHook(WebHook{Event: "new-block", Url: "https://my.domain.com/api/callbacks/doublespend?secret=justbetweenus"})
+	hook, err := bcy.PostHook(Hook{Event: "new-block", URL: "https://my.domain.com/api/callbacks/doublespend?secret=justbetweenus"})
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", hook)
+	if err = bcy.DeleteHook(hook); err != nil {
+		t.Error("Error encountered: ", err)
+	}
 	hooks, err := bcy.ListHooks()
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
-	t.Logf("%+v\n", hooks)
-	if err = bcy.DeleteHook(hooks[0]); err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	hooks, err = bcy.ListHooks()
+	//Should be empty
 	t.Logf("%+v\n", hooks)
 	return
 }
 
 func TestPayments(t *testing.T) {
-	pay, err := bcy.PostPayment(Payment{Destination: Wallet1.Address})
+	pay, err := bcy.PostPayment(PaymentFwd{Destination: keys1.Address})
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
@@ -141,7 +140,7 @@ func TestPayments(t *testing.T) {
 }
 
 func TestNewTX(t *testing.T) {
-	skel := SkelTX(Wallet2.Address, Wallet1.Address, 25000, false)
+	skel := SkelTX(keys2.Address, keys1.Address, 25000, false)
 	wip, err := bcy.NewTX(skel)
 	if err != nil {
 		t.Error("Error encountered: ", err)
@@ -150,7 +149,7 @@ func TestNewTX(t *testing.T) {
 }
 
 func TestMicro(t *testing.T) {
-	mic := MicroTX{Priv: Wallet2.Private, ToAddr: Wallet1.Address, Value: 25000}
+	mic := MicroTX{Priv: keys2.Private, ToAddr: keys1.Address, Value: 25000}
 	result, err := bcy.SendMicro(mic)
 	if err != nil {
 		t.Error("Error encountered: ", err)

@@ -7,7 +7,7 @@ import (
 
 //ListPayments returns a slice of Payments
 //associated with your API.Token.
-func (self *API) ListPayments() (payments []Payment, err error) {
+func (self *API) ListPayments() (payments []PaymentFwd, err error) {
 	u, err := self.buildURL("/payments")
 	resp, err := getResponse(u)
 	if err != nil {
@@ -24,7 +24,7 @@ func (self *API) ListPayments() (payments []Payment, err error) {
 //request associated with your API.Token,
 //and returns a result Payment with a
 //BlockCypher-assigned Id.
-func (self *API) PostPayment(payment Payment) (result Payment, err error) {
+func (self *API) PostPayment(payment PaymentFwd) (result PaymentFwd, err error) {
 	u, err := self.buildURL("/payments")
 	if err != nil {
 		return
@@ -49,7 +49,7 @@ func (self *API) PostPayment(payment Payment) (result Payment, err error) {
 //DeletePayment deletes a Payment forwarding
 //request from BlockCypher's database, based
 //on its Id field.
-func (self *API) DeletePayment(payment Payment) (err error) {
+func (self *API) DeletePayment(payment PaymentFwd) (err error) {
 	u, err := self.buildURL("/payments/" + payment.Id)
 	resp, err := deleteResponse(u)
 	if err != nil {

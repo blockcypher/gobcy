@@ -86,7 +86,6 @@ type TXInput struct {
 	Script      string   `json:"script,omitempty"`
 	Age         int      `json:"age,omitempty"`
 	WalletName  string   `json:"wallet_name,omitempty"`
-	WalletToken string   `json:"wallet_token,omitempty"`
 }
 
 //TXOutput represents the state of a transaction output
@@ -151,7 +150,6 @@ type txSkelErr struct {
 //a blockchain via an OP_RETURN.
 type NullData struct {
 	Data     string `json:"data"`
-	Token    string `json:"token,omitempty"`
 	Encoding string `json:"encoding,omitempty"`
 	Hash     string `json:"hash,omitempty"`
 }
@@ -171,7 +169,6 @@ type MicroTX struct {
 	Wif        string     `json:"from_wif,omitempty"`
 	ToAddr     string     `json:"to_address"`
 	Value      int        `json:"value_satoshis"`
-	Token      string     `json:"token,omitempty"`
 	ChangeAddr string     `json:"change_address,omitempty"`
 	Wait       bool       `json:"wait_guarantee,omitempty"`
 	ToSign     []string   `json:"tosign,omitempty"`
@@ -180,7 +177,6 @@ type MicroTX struct {
 	Inputs     []TXInput  `json:"inputs,omitempty"`
 	Outputs    []TXOutput `json:"outputs,omitempty"`
 	Fees       int        `json:"fees,omitempty"`
-	Hash       string     `json:"hash,omitempty"`
 }
 
 //Addr represents information about the state
@@ -206,15 +202,27 @@ type Addr struct {
 //generation API. Large amounts are not recommended to be
 //stored with these addresses.
 type AddrKeychain struct {
-	Address string `json:"address"`
-	Private string `json:"private"`
-	Public  string `json:"public"`
-	Wif     string `json:"wif"`
+	Address    string   `json:"address"`
+	Private    string   `json:"private"`
+	Public     string   `json:"public"`
+	Wif        string   `json:"wif"`
+	PubKeys    []string `json:"pubkeys,omitempty"`
+	ScriptType string   `json:"script_type,omitempty"`
 }
 
-//WebHook represents a WebHook event. You can include
-//your Token for notification management, but otherwise
-//it's optional.
+//Wallet represents information about either a standard
+//or HD (hierarchical deterministic) wallet.
+//Typically, wallets can be used wherever an address can be
+//used within the API.
+type Wallet struct {
+	Name      string   `json:"name"`
+	Addresses []string `json:"addresses,omitempty"`
+	HD        bool     `json:"hd,omitempty"`
+	ExtPubKey string   `json:"extended_public_key,omitempty"`
+	Subchain  []int    `json:"subchain_indexes"`
+}
+
+//Hook represents a WebHook/WebSockets event.
 //BlockCypher supports the following events:
 //	Event = "unconfirmed-tx"
 //	Event = "new-block"
@@ -226,33 +234,33 @@ type AddrKeychain struct {
 //notifications, if appropriate. Id is returned by
 //BlockCyphers servers after Posting a new WebHook; you
 //shouldn't manually generate this field.
-type WebHook struct {
-	Id      string `json:"id,omitempty"`
-	Token   string `json:"token,omitempty"`
-	Event   string `json:"event"`
-	Url     string `json:"url"`
-	Hash    string `json:"hash,omitempty"`
-	Address string `json:"address,omitempty"`
-	Script  string `json:"script,omitempty"`
+type Hook struct {
+	Id            string `json:"id,omitempty"`
+	Event         string `json:"event"`
+	Hash          string `json:"hash,omitempty"`
+	WalletName    string `json:"wallet_name,omitempty"`
+	Confirmations int    `json:"confirmations,omitempty"`
+	Address       string `json:"address,omitempty"`
+	Script        string `json:"script,omitempty"`
+	URL           string `json:"url"`
 }
 
-//Payment represents a reference to a payment forwarding
-//request.
-type Payment struct {
+//PaymentFwd represents a reference to
+//a Payment Forwarding request.
+type PaymentFwd struct {
 	Id             string   `json:"id,omitempty"`
-	Token          string   `json:"token,omitempty"`
 	Destination    string   `json:"destination"`
 	InputAddr      string   `json:"input_address,omitempty"`
 	ProcessAddr    string   `json:"process_fees_address,omitempty"`
 	ProcessPercent float64  `json:"process_fees_percent,omitempty"`
-	ProcessSatoshi int      `json:"process_fees_satoshis,omitempty"`
-	CallbackUrl    string   `json:"callback_url,omitempty"`
+	ProcessValue   int      `json:"process_fees_satoshis,omitempty"`
+	CallbackURL    string   `json:"callback_url,omitempty"`
 	EnableConfirm  bool     `json:"enable_confirmations,omitempty"`
 	MiningFees     int      `json:"mining_fees_satoshis,omitempty"`
 	TXHistory      []string `json:"transactions,omitempty"`
 }
 
-//Payback represents a Payment Forwarding callback.
+//Payback represents a Payment Forwarding Callback.
 //It's more fun to call it a "payback."
 type Payback struct {
 	Value       int    `json:"value"`

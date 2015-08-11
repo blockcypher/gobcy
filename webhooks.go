@@ -7,7 +7,7 @@ import (
 
 //ListHooks returns a slice of WebHooks associated
 //with your Config.Token.
-func (self *API) ListHooks() (hooks []WebHook, err error) {
+func (self *API) ListHooks() (hooks []Hook, err error) {
 	u, err := self.buildURL("/hooks")
 	resp, err := getResponse(u)
 	if err != nil {
@@ -23,7 +23,7 @@ func (self *API) ListHooks() (hooks []WebHook, err error) {
 //PostHook creates a new WebHook associated
 //with your Config.Token, and returns a result
 //WebHook with a BlockCypher-assigned Id.
-func (self *API) PostHook(hook WebHook) (result WebHook, err error) {
+func (self *API) PostHook(hook Hook) (result Hook, err error) {
 	u, err := self.buildURL("/hooks")
 	if err != nil {
 		return
@@ -48,7 +48,7 @@ func (self *API) PostHook(hook WebHook) (result WebHook, err error) {
 //DeleteHook deletes a WebHook notification
 //from BlockCypher's database, based on its
 //Id field.
-func (self *API) DeleteHook(hook WebHook) (err error) {
+func (self *API) DeleteHook(hook Hook) (err error) {
 	u, err := self.buildURL("/hooks/" + hook.Id)
 	resp, err := deleteResponse(u)
 	if err != nil {
