@@ -71,6 +71,42 @@ func TestGetBlockNextTXs(t *testing.T) {
 	t.Logf("%+v\n", bl2)
 }
 
+func TestGetTXConf(t *testing.T) {
+	conf, err := bcy.GetTXConf(txhash2)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("%+v\n", conf)
+	return
+}
+
+func TestGetAddrBal(t *testing.T) {
+	addr, err := bcy.GetAddrBal(keys1.Address)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("%+v\n", addr)
+	return
+}
+
+func TestGetAddr(t *testing.T) {
+	addr, err := bcy.GetAddr(keys1.Address)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("%+v\n", addr)
+	return
+}
+
+func TestGetAddrFull(t *testing.T) {
+	addr, err := bcy.GetAddrFull(keys2.Address)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("%+v\n", addr)
+	return
+}
+
 func TestUnTX(t *testing.T) {
 	txs, err := bcy.GetUnTX()
 	if err != nil {
@@ -86,33 +122,6 @@ func TestGetTX(t *testing.T) {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", tx)
-	return
-}
-
-func TestGetTXConf(t *testing.T) {
-	conf, err := bcy.GetTXConf(txhash2)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", conf)
-	return
-}
-
-func TestGetAddr(t *testing.T) {
-	addr, err := bcy.GetAddr(keys1.Address)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", addr)
-	return
-}
-
-func TestGetAddrFull(t *testing.T) {
-	addr, err := bcy.GetAddrFull(keys2.Address, false)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", addr)
 	return
 }
 

@@ -7,10 +7,57 @@ import (
 	"strconv"
 )
 
-//GetAddr returns balance information for a given public
+//GetAddrBal returns balance information for a given public
 //address. Does not include transaction details.
-func (self *API) GetAddr(hash string) (addr Addr, err error) {
+func (self *API) GetAddrBal(hash string) (addr Addr, err error) {
 	u, err := self.buildURL("/addrs/" + hash + "/balance")
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//decode JSON into Addr
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&addr)
+	return
+}
+
+//GetAddr returns information for a given public
+//address, including a slice of confirmed and unconfirmed
+//transaction outpus via the TXRef arrays in the Address
+//type.
+func (self *API) GetAddr(hash string) (addr Addr, err error) {
+	addr, err = self.GetAddrCustom(hash, false, 0, 0, 0)
+	return
+}
+
+//GetAddrCustom returns information for a given public
+//address, including a slice of confirmed and unconfirmed
+//transaction outpus via the TXRef arrays in the Address
+//type. Takes 4 additional parameters compared to GetAddr:
+//  "unspent," which if true will only return TXRefs
+//  that are unpsent outputs (UTXOs).
+//  "confirms," which will only return TXRefs
+//  that have reached this number of confirmations or more.
+//  Set it to 0 to ignore this parameter.
+//  "before," which will only return transactions below
+//  this height in the blockchain. Useful for paging. Set it
+//  to 0 to ignore this parameter.
+//  "limit," which return this number of TXRefs per call.
+//  The default is 50, maximum is 200. Set it to 0 to ignore
+//  this parameter.
+func (self *API) GetAddrCustom(hash string, unspent bool, confirms int, before int, limit int) (addr Addr, err error) {
+	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent)}
+	if confirms > 0 {
+		params["confirmations"] = strconv.Itoa(confirms)
+	}
+	if before > 0 {
+		params["before"] = strconv.Itoa(before)
+	}
+	if limit > 0 {
+		params["limit"] = strconv.Itoa(limit)
+	}
+	u, err := self.buildURLParams("/addrs/"+hash, params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -24,12 +71,9 @@ func (self *API) GetAddr(hash string) (addr Addr, err error) {
 
 //GetAddrFull returns information for a given public
 //address, including a slice of transactions associated
-//with this address. Takes an additional parameter "unspent."
-//If true, unspent will only return transactions with unspent
-//outputs (UTXO).
-func (self *API) GetAddrFull(hash string, unspent bool) (addr Addr, err error) {
-	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent)}
-	u, err := self.buildURLParams("/addrs/"+hash+"/full", params)
+//with this address.
+func (self *API) GetAddrFull(hash string) (addr Addr, err error) {
+	u, err := self.buildURL("/addrs/" + hash + "/full")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
