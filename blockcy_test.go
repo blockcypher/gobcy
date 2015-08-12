@@ -57,6 +57,20 @@ func TestGetBlock(t *testing.T) {
 	return
 }
 
+func TestGetBlockNextTXs(t *testing.T) {
+	//Also tests GetBlockPage directly
+	bl, err := bcy.GetBlockPage(0, "0000cb69e3c85ec1a4a17d8a66634c1cf136acc9dca9a5a71664a593f92bc46e", 0, 1)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("%+v\n", bl)
+	bl2, err := bcy.GetBlockNextTXs(bl)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("%+v\n", bl2)
+}
+
 func TestUnTX(t *testing.T) {
 	txs, err := bcy.GetUnTX()
 	if err != nil {

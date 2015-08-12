@@ -30,6 +30,32 @@ func (self *API) GetBlock(height int, hash string) (block Block, err error) {
 	return
 }
 
+//GetBlockNextTXs returns the the next page of TXids based
+//on the NextTXs URL in this Block. If NextTXs is empty,
+//this will return an error.
+func (self *API) GetBlockNextTXs(this Block) (next Block, err error) {
+	if this.NextTXs == "" {
+		err = errors.New("Func GetNextTXs: This Block doesn't have more transactions")
+		return
+	}
+	if len(this.TXids) == 0 {
+		err = errors.New("Func GetNextTXs: This Block doesn't have any TXids in the array, meaning no more transactions")
+		return
+	}
+	txurl, err := url.Parse(this.NextTXs)
+	if err != nil {
+		return
+	}
+	params := txurl.Query()
+	txstart, err := strconv.Atoi(params.Get("txstart"))
+	limit, err := strconv.Atoi(params.Get("limit"))
+	if err != nil {
+		return
+	}
+	next, err = self.GetBlockPage(0, this.Hash, txstart, limit)
+	return
+}
+
 //GetBlockPage returns a Block based on either height
 //or hash, and includes custom variables for txstart/limit of txs.
 //If both height and hash are sent, it will throw an error. If txstart/limit = 0,
