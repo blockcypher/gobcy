@@ -117,7 +117,7 @@ type TXRef struct {
 	Pref          string    `json:"preference"`
 	Spent         bool      `json:"spent"`
 	DoubleSpend   bool      `json:"double_spend"`
-	DoubleOf      string    `json:"double_of,omitempty`
+	DoubleOf      string    `json:"double_of,omitempty"`
 	Confirmations int       `json:"confirmations"`
 	RefBalance    int       `json:"ref_balance,omitempty"`
 	Confidence    float64   `json:"confidence,omitempty"`
