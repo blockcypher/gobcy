@@ -8,8 +8,8 @@ import (
 )
 
 //GetUnTX returns an array of the latest unconfirmed TXs.
-func (self *API) GetUnTX() (txs []TX, err error) {
-	u, err := self.buildURL("/txs")
+func (api *API) GetUnTX() (txs []TX, err error) {
+	u, err := api.buildURL("/txs")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -22,8 +22,8 @@ func (self *API) GetUnTX() (txs []TX, err error) {
 }
 
 //GetTX returns a TX represented by the passed hash.
-func (self *API) GetTX(hash string) (tx TX, err error) {
-	u, err := self.buildURL("/txs/" + hash)
+func (api *API) GetTX(hash string) (tx TX, err error) {
+	u, err := api.buildURL("/txs/" + hash)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -39,8 +39,8 @@ func (self *API) GetTX(hash string) (tx TX, err error) {
 //confidence that an unconfirmed transaction will be confirmed
 //in the next block. If it returns a 1, the transaction has
 //already been confirmed.
-func (self *API) GetTXConf(hash string) (conf float64, err error) {
-	u, err := self.buildURL("/txs/" + hash + "/confidence")
+func (api *API) GetTXConf(hash string) (conf float64, err error) {
+	u, err := api.buildURL("/txs/" + hash + "/confidence")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -110,8 +110,8 @@ func SkelMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int,
 
 //NewTX takes a partially formed TX and returns
 //a WipTX with the data that needs to be signed.
-func (self *API) NewTX(trans TX) (wip TXSkel, err error) {
-	u, err := self.buildURL("/txs/new")
+func (api *API) NewTX(trans TX) (wip TXSkel, err error) {
+	u, err := api.buildURL("/txs/new")
 	if err != nil {
 		return
 	}
@@ -137,8 +137,8 @@ func (self *API) NewTX(trans TX) (wip TXSkel, err error) {
 //network. WipTX requires a fully formed TX, Signatures,
 //and PubKeys. PubKeys should not be included in the
 //special case of multi-sig addresses.
-func (self *API) SendTX(wip TXSkel) (trans TXSkel, err error) {
-	u, err := self.buildURL("/txs/send")
+func (api *API) SendTX(wip TXSkel) (trans TXSkel, err error) {
+	u, err := api.buildURL("/txs/send")
 	if err != nil {
 		return
 	}
@@ -161,8 +161,8 @@ func (self *API) SendTX(wip TXSkel) (trans TXSkel, err error) {
 
 //PushTX takes a hex-encoded transaction string
 //and pushes it directly to the Coin/Chain network.
-func (self *API) PushTX(hex string) (trans TXSkel, err error) {
-	u, err := self.buildURL("/txs/push")
+func (api *API) PushTX(hex string) (trans TXSkel, err error) {
+	u, err := api.buildURL("/txs/push")
 	if err != nil {
 		return
 	}
@@ -186,8 +186,8 @@ func (self *API) PushTX(hex string) (trans TXSkel, err error) {
 //DecodeTX takes a hex-encoded transaction string
 //and decodes it into a TX object, without sending
 //it along to the Coin/Chain network.
-func (self *API) DecodeTX(hex string) (trans TXSkel, err error) {
-	u, err := self.buildURL("/txs/decode")
+func (api *API) DecodeTX(hex string) (trans TXSkel, err error) {
+	u, err := api.buildURL("/txs/decode")
 	if err != nil {
 		return
 	}

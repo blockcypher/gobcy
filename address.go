@@ -10,8 +10,8 @@ import (
 //GetAddrBal returns balance information for a given public
 //address. Fastest Address API call, but does not
 //include transaction details.
-func (self *API) GetAddrBal(hash string) (addr Addr, err error) {
-	u, err := self.buildURL("/addrs/" + hash + "/balance")
+func (api *API) GetAddrBal(hash string) (addr Addr, err error) {
+	u, err := api.buildURL("/addrs/" + hash + "/balance")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -28,8 +28,8 @@ func (self *API) GetAddrBal(hash string) (addr Addr, err error) {
 //transaction outpus via the TXRef arrays in the Address
 //type. Returns more information than GetAddrBal, but
 //slightly slower.
-func (self *API) GetAddr(hash string) (addr Addr, err error) {
-	addr, err = self.GetAddrCustom(hash, false, 0, 0, 0)
+func (api *API) GetAddr(hash string) (addr Addr, err error) {
+	addr, err = api.GetAddrCustom(hash, false, 0, 0, 0)
 	return
 }
 
@@ -48,7 +48,7 @@ func (self *API) GetAddr(hash string) (addr Addr, err error) {
 //  "limit," which return this number of TXRefs per call.
 //  The default is 50, maximum is 200. Set it to 0 to ignore
 //  this parameter and use the API-set default.
-func (self *API) GetAddrCustom(hash string, unspent bool, confirms int, before int, limit int) (addr Addr, err error) {
+func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before int, limit int) (addr Addr, err error) {
 	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent)}
 	if confirms > 0 {
 		params["confirmations"] = strconv.Itoa(confirms)
@@ -59,7 +59,7 @@ func (self *API) GetAddrCustom(hash string, unspent bool, confirms int, before i
 	if limit > 0 {
 		params["limit"] = strconv.Itoa(limit)
 	}
-	u, err := self.buildURLParams("/addrs/"+hash, params)
+	u, err := api.buildURLParams("/addrs/"+hash, params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -75,8 +75,8 @@ func (self *API) GetAddrCustom(hash string, unspent bool, confirms int, before i
 //address, including a slice of TXs associated
 //with this address. Returns more data than GetAddr since
 //it includes full transactions, but slowest Address query.
-func (self *API) GetAddrFull(hash string) (addr Addr, err error) {
-	addr, err = self.GetAddrFullCustom(hash, false, 0, 0)
+func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
+	addr, err = api.GetAddrFullCustom(hash, false, 0, 0)
 	return
 }
 
@@ -93,7 +93,7 @@ func (self *API) GetAddrFull(hash string) (addr Addr, err error) {
 //  "limit," which return this number of TXs per call.
 //  The default is 10, maximum is 50. Set it to 0 to ignore
 //  this parameter and use the API-set default.
-func (self *API) GetAddrFullCustom(hash string, hex bool, before int, limit int) (addr Addr, err error) {
+func (api *API) GetAddrFullCustom(hash string, hex bool, before int, limit int) (addr Addr, err error) {
 	params := map[string]string{"includeHex": strconv.FormatBool(hex)}
 	if before > 0 {
 		params["before"] = strconv.Itoa(before)
@@ -101,7 +101,7 @@ func (self *API) GetAddrFullCustom(hash string, hex bool, before int, limit int)
 	if limit > 0 {
 		params["limit"] = strconv.Itoa(limit)
 	}
-	u, err := self.buildURLParams("/addrs/"+hash+"/full", params)
+	u, err := api.buildURLParams("/addrs/"+hash+"/full", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -117,8 +117,8 @@ func (self *API) GetAddrFullCustom(hash string, hex bool, before int, limit int)
 //transactions within the specified coin/chain. Please note that
 //this call must be made over SSL, and it is not recommended to keep
 //large amounts in these addresses, or for very long.
-func (self *API) GenAddrKeychain() (pair AddrKeychain, err error) {
-	u, err := self.buildURL("/addrs")
+func (api *API) GenAddrKeychain() (pair AddrKeychain, err error) {
+	u, err := api.buildURL("/addrs")
 	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
@@ -133,8 +133,8 @@ func (self *API) GenAddrKeychain() (pair AddrKeychain, err error) {
 //Faucet funds the AddrKeychain with an amount. Only works on BlockCypher's
 //Testnet and Bitcoin Testnet3. Returns the transaction hash funding
 //your AddrKeychain.
-func (self *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
-	if !(self.Coin == "bcy" && self.Chain == "test") && !(self.Coin == "btc" && self.Chain == "test3") {
+func (api *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
+	if !(api.Coin == "bcy" && api.Chain == "test") && !(api.Coin == "btc" && api.Chain == "test3") {
 		err = errors.New("Faucet: Cannot use Faucet unless on BlockCypher Testnet or Bitcoin Testnet3.")
 		return
 	}
@@ -142,7 +142,7 @@ func (self *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
 		err = errors.New("Faucet: Cannot fund with more than 10,000,000 coins at a time.")
 		return
 	}
-	u, err := self.buildURL("/faucet")
+	u, err := api.buildURL("/faucet")
 	if err != nil {
 		return
 	}

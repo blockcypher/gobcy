@@ -1,4 +1,4 @@
-//Pacakge blockcy implements a wrapper for the http://blockcypher.com API.
+//Package blockcy implements a wrapper for the http://blockcypher.com API.
 //You can use it to interact with addresses, transactions, and blocks from
 //various blockchains, including Bitcoin's main and test3 chains,
 //and the BlockCypher test chain.
@@ -12,9 +12,7 @@ import (
 	"net/url"
 )
 
-const (
-	BaseURL = "https://api.blockcypher.com/v1/"
-)
+const baseURL = "https://api.blockcypher.com/v1/"
 
 //API stores your BlockCypher Token, and the coin/chain
 //you're querying. Coins can be "btc","bcy","ltc", and "doge".
@@ -83,25 +81,23 @@ func deleteResponse(target *url.URL) (resp *http.Response, err error) {
 }
 
 //constructs BlockCypher URLs for requests
-func (self *API) buildURL(u string) (target *url.URL, err error) {
-	target, err = url.Parse(BaseURL + self.Coin +
-		"/" + self.Chain + u)
+func (api *API) buildURL(u string) (target *url.URL, err error) {
+	target, err = url.Parse(baseURL + api.Coin + "/" + api.Chain + u)
 	if err != nil {
 		return
 	}
 	//add token to url, if present
-	if self.Token != "" {
+	if api.Token != "" {
 		values := target.Query()
-		values.Set("token", self.Token)
+		values.Set("token", api.Token)
 		target.RawQuery = values.Encode()
 	}
 	return
 }
 
 //constructs BlockCypher URLs with parameters for requests
-func (self *API) buildURLParams(u string, params map[string]string) (target *url.URL, err error) {
-	target, err = url.Parse(BaseURL + self.Coin +
-		"/" + self.Chain + u)
+func (api *API) buildURLParams(u string, params map[string]string) (target *url.URL, err error) {
+	target, err = url.Parse(baseURL + api.Coin + "/" + api.Chain + u)
 	if err != nil {
 		return
 	}
@@ -111,8 +107,8 @@ func (self *API) buildURLParams(u string, params map[string]string) (target *url
 		values.Set(k, v)
 	}
 	//add token to url, if present
-	if self.Token != "" {
-		values.Set("token", self.Token)
+	if api.Token != "" {
+		values.Set("token", api.Token)
 	}
 	target.RawQuery = values.Encode()
 	return

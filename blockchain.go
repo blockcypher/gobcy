@@ -9,8 +9,8 @@ import (
 
 //GetChain returns the current state of the
 //configured Coin/Chain.
-func (self *API) GetChain() (chain Blockchain, err error) {
-	u, err := self.buildURL("")
+func (api *API) GetChain() (chain Blockchain, err error) {
+	u, err := api.buildURL("")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -25,15 +25,15 @@ func (self *API) GetChain() (chain Blockchain, err error) {
 //GetBlock returns a Block based on either height
 //or hash. If both height and hash are sent, it will
 //throw an error.
-func (self *API) GetBlock(height int, hash string) (block Block, err error) {
-	block, err = self.GetBlockPage(height, hash, 0, 0)
+func (api *API) GetBlock(height int, hash string) (block Block, err error) {
+	block, err = api.GetBlockPage(height, hash, 0, 0)
 	return
 }
 
 //GetBlockNextTXs returns the the next page of TXids based
 //on the NextTXs URL in this Block. If NextTXs is empty,
 //this will return an error.
-func (self *API) GetBlockNextTXs(this Block) (next Block, err error) {
+func (api *API) GetBlockNextTXs(this Block) (next Block, err error) {
 	if this.NextTXs == "" {
 		err = errors.New("Func GetNextTXs: This Block doesn't have more transactions")
 		return
@@ -52,7 +52,7 @@ func (self *API) GetBlockNextTXs(this Block) (next Block, err error) {
 	if err != nil {
 		return
 	}
-	next, err = self.GetBlockPage(0, this.Hash, txstart, limit)
+	next, err = api.GetBlockPage(0, this.Hash, txstart, limit)
 	return
 }
 
@@ -60,7 +60,7 @@ func (self *API) GetBlockNextTXs(this Block) (next Block, err error) {
 //or hash, and includes custom variables for txstart/limit of txs.
 //If both height and hash are sent, it will throw an error. If txstart/limit = 0,
 //it will use the API-defaults for both.
-func (self *API) GetBlockPage(height int, hash string, txstart int, limit int) (block Block, err error) {
+func (api *API) GetBlockPage(height int, hash string, txstart int, limit int) (block Block, err error) {
 	var u *url.URL
 	ustr := "/blocks/"
 	if height != 0 && hash != "" {
@@ -72,13 +72,13 @@ func (self *API) GetBlockPage(height int, hash string, txstart int, limit int) (
 		ustr = ustr + hash
 	}
 	if txstart == 0 && limit == 0 {
-		u, err = self.buildURL(ustr)
+		u, err = api.buildURL(ustr)
 	} else {
 		params := map[string]string{
 			"txstart": strconv.Itoa(txstart),
 			"limit":   strconv.Itoa(limit),
 		}
-		u, err = self.buildURLParams(ustr, params)
+		u, err = api.buildURLParams(ustr, params)
 	}
 	resp, err := getResponse(u)
 	if err != nil {

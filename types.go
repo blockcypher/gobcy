@@ -235,7 +235,7 @@ type Wallet struct {
 //BlockCyphers servers after Posting a new WebHook; you
 //shouldn't manually generate this field.
 type Hook struct {
-	Id            string `json:"id,omitempty"`
+	ID            string `json:"id,omitempty"`
 	Event         string `json:"event"`
 	Hash          string `json:"hash,omitempty"`
 	WalletName    string `json:"wallet_name,omitempty"`
@@ -248,7 +248,7 @@ type Hook struct {
 //PaymentFwd represents a reference to
 //a Payment Forwarding request.
 type PaymentFwd struct {
-	Id             string   `json:"id,omitempty"`
+	ID             string   `json:"id,omitempty"`
 	Destination    string   `json:"destination"`
 	InputAddr      string   `json:"input_address,omitempty"`
 	ProcessAddr    string   `json:"process_fees_address,omitempty"`
