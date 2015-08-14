@@ -202,10 +202,10 @@ type Addr struct {
 //generation API. Large amounts are not recommended to be
 //stored with these addresses.
 type AddrKeychain struct {
-	Address    string   `json:"address"`
-	Private    string   `json:"private"`
-	Public     string   `json:"public"`
-	Wif        string   `json:"wif"`
+	Address    string   `json:"address,omitempty"`
+	Private    string   `json:"private,omitempty"`
+	Public     string   `json:"public,omitempty"`
+	Wif        string   `json:"wif,omitempty"`
 	PubKeys    []string `json:"pubkeys,omitempty"`
 	ScriptType string   `json:"script_type,omitempty"`
 }

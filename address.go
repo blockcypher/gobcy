@@ -8,7 +8,8 @@ import (
 )
 
 //GetAddrBal returns balance information for a given public
-//address. Does not include transaction details.
+//address. Fastest Address API call, but does not
+//include transaction details.
 func (self *API) GetAddrBal(hash string) (addr Addr, err error) {
 	u, err := self.buildURL("/addrs/" + hash + "/balance")
 	resp, err := getResponse(u)
@@ -25,7 +26,8 @@ func (self *API) GetAddrBal(hash string) (addr Addr, err error) {
 //GetAddr returns information for a given public
 //address, including a slice of confirmed and unconfirmed
 //transaction outpus via the TXRef arrays in the Address
-//type.
+//type. Returns more information than GetAddrBal, but
+//slightly slower.
 func (self *API) GetAddr(hash string) (addr Addr, err error) {
 	addr, err = self.GetAddrCustom(hash, false, 0, 0, 0)
 	return
@@ -45,7 +47,7 @@ func (self *API) GetAddr(hash string) (addr Addr, err error) {
 //  to 0 to ignore this parameter.
 //  "limit," which return this number of TXRefs per call.
 //  The default is 50, maximum is 200. Set it to 0 to ignore
-//  this parameter.
+//  this parameter and use the API-set default.
 func (self *API) GetAddrCustom(hash string, unspent bool, confirms int, before int, limit int) (addr Addr, err error) {
 	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent)}
 	if confirms > 0 {
@@ -70,10 +72,36 @@ func (self *API) GetAddrCustom(hash string, unspent bool, confirms int, before i
 }
 
 //GetAddrFull returns information for a given public
-//address, including a slice of transactions associated
-//with this address.
+//address, including a slice of TXs associated
+//with this address. Returns more data than GetAddr since
+//it includes full transactions, but slowest Address query.
 func (self *API) GetAddrFull(hash string) (addr Addr, err error) {
-	u, err := self.buildURL("/addrs/" + hash + "/full")
+	addr, err = self.GetAddrFullCustom(hash, false, 0, 0)
+	return
+}
+
+//GetAddrFullCustom returns information for a given public
+//address, including a slice of TXs associated
+//with this address. Returns more data than GetAddr since
+//it includes full transactions, but slower. Takes 3
+//additional parameters compared to GetAddrFull:
+//  "hex," which if true will return the full hex-encoded
+//  raw transaction for each TX. False by default.
+//  "before," which will only return transactions below
+//  this height in the blockchain. Useful for paging. Set it
+//  to 0 to ignore this parameter.
+//  "limit," which return this number of TXs per call.
+//  The default is 10, maximum is 50. Set it to 0 to ignore
+//  this parameter and use the API-set default.
+func (self *API) GetAddrFullCustom(hash string, hex bool, before int, limit int) (addr Addr, err error) {
+	params := map[string]string{"includeHex": strconv.FormatBool(hex)}
+	if before > 0 {
+		params["before"] = strconv.Itoa(before)
+	}
+	if limit > 0 {
+		params["limit"] = strconv.Itoa(limit)
+	}
+	u, err := self.buildURLParams("/addrs/"+hash+"/full", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
