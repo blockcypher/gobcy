@@ -130,6 +130,37 @@ func (api *API) GenAddrKeychain() (pair AddrKeychain, err error) {
 	return
 }
 
+//GenAddrMultisig generates a P2SH multisignature address using an array
+//of PubKeys and the ScriptType from a AddrKeychain. Other fields are
+//ignored, and the ScriptType must be a "multisig-n-of-m" type. Returns
+//an AddrKeychain with the same PubKeys, ScriptType, and the proper
+//P2SH address in the AddrKeychain's address field.
+func (api *API) GenAddrMultisig(multi AddrKeychain) (addr AddrKeychain, err error) {
+	if len(multi.PubKeys) == 0 || multi.ScriptType == "" {
+		err = errors.New("GenAddrMultisig: PubKeys or ScriptType are empty.")
+		return
+	}
+	u, err := api.buildURL("/addrs")
+	if err != nil {
+		return
+	}
+	//encode response into ReadWriter
+	var data bytes.Buffer
+	enc := json.NewEncoder(&data)
+	if err = enc.Encode(&multi); err != nil {
+		return
+	}
+	resp, err := postResponse(u, &data)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//Decode JSON into result
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&addr)
+	return
+}
+
 //Faucet funds the AddrKeychain with an amount. Only works on BlockCypher's
 //Testnet and Bitcoin Testnet3. Returns the transaction hash funding
 //your AddrKeychain.
