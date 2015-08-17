@@ -229,20 +229,23 @@ type Wallet struct {
 //	Event = "confirmed-tx"
 //	Event = "tx-confirmation"
 //	Event = "double-spend-tx"
+//  Event = "tx-confidence"
 //Hash, Address, and Script are all optional; creating
 //a WebHook with any of them will filter the resulting
-//notifications, if appropriate. Id is returned by
+//notifications, if appropriate. ID is returned by
 //BlockCyphers servers after Posting a new WebHook; you
 //shouldn't manually generate this field.
 type Hook struct {
-	ID            string `json:"id,omitempty"`
-	Event         string `json:"event"`
-	Hash          string `json:"hash,omitempty"`
-	WalletName    string `json:"wallet_name,omitempty"`
-	Confirmations int    `json:"confirmations,omitempty"`
-	Address       string `json:"address,omitempty"`
-	Script        string `json:"script,omitempty"`
-	URL           string `json:"url"`
+	ID            string  `json:"id,omitempty"`
+	Event         string  `json:"event"`
+	Hash          string  `json:"hash,omitempty"`
+	WalletName    string  `json:"wallet_name,omitempty"`
+	Address       string  `json:"address,omitempty"`
+	Confirmations int     `json:"confirmations,omitempty"`
+	Confidence    float32 `json:"confidence,omitempty"`
+	Script        string  `json:"script,omitempty"`
+	URL           string  `json:"url,omitempty"`
+	CallbackErrs  int     `json:"callback_errors,omitempty"`
 }
 
 //PaymentFwd represents a reference to
