@@ -1,5 +1,11 @@
 package blockcy
 
+import (
+	"bytes"
+	"encoding/json"
+	"net/url"
+)
+
 //CreateWallet creates a public-address watching wallet
 //associated with this token/coin/chain, usable anywhere
 //in the API where an Address might be used (just use
@@ -11,6 +17,31 @@ package blockcy
 //Make sure your Wallet has "HD" set to "true" if you're
 //requesting to construct an HD wallet.
 func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
+	//Decide whether to create HD or regular Wallet
+	var u *url.URL
+	if req.HD {
+		u, err = api.buildURL("/wallets/hd")
+	} else {
+		u, err = api.buildURL("/wallets")
+	}
+	if err != nil {
+		return
+	}
+	//encode response into ReadWriter
+	var data bytes.Buffer
+	enc := json.NewEncoder(&data)
+	if err = enc.Encode(&req); err != nil {
+		return
+	}
+	resp, err := postResponse(u, &data)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//Decode JSON into result
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&addr)
+	return
 }
 
 //GetWallet gets a Wallet based on its name, the associated
