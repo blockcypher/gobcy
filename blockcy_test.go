@@ -80,17 +80,17 @@ func TestBlockchain(t *testing.T) {
 func TestAddress(t *testing.T) {
 	addr, err := bcy.GetAddrBal(keys1.Address)
 	if err != nil {
-		t.Error("Error encountered: ", err)
+		t.Error("GetAddrBal error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
 	addr, err = bcy.GetAddr(keys1.Address)
 	if err != nil {
-		t.Error("Error encountered: ", err)
+		t.Error("GetAddr error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
 	addr, err = bcy.GetAddrFull(keys2.Address)
 	if err != nil {
-		t.Error("Error encountered: ", err)
+		t.Error("GetAddrFull error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
 	return
@@ -112,21 +112,30 @@ func TestGenAddrMultisig(t *testing.T) {
 	t.Logf("%+v\n", response)
 }
 
-func TestUnTX(t *testing.T) {
+func TestTX(t *testing.T) {
 	txs, err := bcy.GetUnTX()
 	if err != nil {
-		t.Error("Error encountered: ", err)
+		t.Error("GetUnTX error encountered: ", err)
 	}
 	t.Logf("%+v\n", txs)
-	return
-}
-
-func TestGetTX(t *testing.T) {
 	tx, err := bcy.GetTX(txhash1)
 	if err != nil {
-		t.Error("Error encountered: ", err)
+		t.Error("GetTX error encountered: ", err)
 	}
 	t.Logf("%+v\n", tx)
+	//Create and Send TXSkeleton
+	temp := TempNewTX(keys2.Address, keys1.Address, 25000, false)
+	skel, err := bcy.NewTX(temp)
+	if err != nil {
+		t.Error("NewTX error encountered: ", err)
+	}
+	t.Logf("%+v\n", skel)
+	/*Will uncomment once client-side signing integrated into SDK
+	skel, err = bcy.SendTX(skel)
+	if err != nil {
+		t.Error("SendTX error encountered: ", err)
+	}
+	t.Logf("%+v\n", skel)*/
 	return
 }
 
@@ -148,32 +157,22 @@ func TestHooks(t *testing.T) {
 	return
 }
 
-func TestPayments(t *testing.T) {
+func TestPayment(t *testing.T) {
 	pay, err := bcy.PostPayment(PaymentFwd{Destination: keys1.Address})
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", pay)
+	if err = bcy.DeletePayment(pay); err != nil {
+		t.Error("Error encountered: ", err)
+	}
 	pays, err := bcy.ListPayments()
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
-	t.Logf("%+v\n", pays)
-	if err = bcy.DeletePayment(pay); err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	pays, err = bcy.ListPayments()
+	//Should be empty
 	t.Logf("%+v\n", pays)
 	return
-}
-
-func TestNewTX(t *testing.T) {
-	skel := SkelTX(keys2.Address, keys1.Address, 25000, false)
-	wip, err := bcy.NewTX(skel)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", wip)
 }
 
 func TestMicro(t *testing.T) {
@@ -188,4 +187,5 @@ func TestMicro(t *testing.T) {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", txmic)
+	return
 }

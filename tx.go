@@ -54,9 +54,9 @@ func (api *API) GetTXConf(hash string) (conf float64, err error) {
 	return
 }
 
-//SkelTX creates a skeleton transaction,
+//TempNewTX creates a template transaction,
 //suitable for use in NewTX.
-func SkelTX(inAddr string, outAddr string, amount int, confirm bool) (trans TX) {
+func TempNewTX(inAddr string, outAddr string, amount int, confirm bool) (trans TX) {
 	trans.Inputs = make([]TXInput, 1)
 	trans.Outputs = make([]TXOutput, 1)
 	trans.Inputs[0].Addresses = make([]string, 1)
@@ -109,8 +109,8 @@ func SkelMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int,
 }
 
 //NewTX takes a partially formed TX and returns
-//a WipTX with the data that needs to be signed.
-func (api *API) NewTX(trans TX) (wip TXSkel, err error) {
+//a TXSkel with the data that needs to be signed.
+func (api *API) NewTX(trans TX) (skel TXSkel, err error) {
 	u, err := api.buildURL("/txs/new")
 	if err != nil {
 		return
@@ -128,16 +128,16 @@ func (api *API) NewTX(trans TX) (wip TXSkel, err error) {
 	defer resp.Body.Close()
 	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&wip)
+	err = dec.Decode(&skel)
 	return
 }
 
-//SendTX takes a WipTX, returns the completed
+//SendTX takes a TXSkel, returns the completed
 //transaction and sends it across the Coin/Chain
-//network. WipTX requires a fully formed TX, Signatures,
+//network. TXSkel requires a fully formed TX, Signatures,
 //and PubKeys. PubKeys should not be included in the
 //special case of multi-sig addresses.
-func (api *API) SendTX(wip TXSkel) (trans TXSkel, err error) {
+func (api *API) SendTX(skel TXSkel) (trans TXSkel, err error) {
 	u, err := api.buildURL("/txs/send")
 	if err != nil {
 		return
@@ -145,7 +145,7 @@ func (api *API) SendTX(wip TXSkel) (trans TXSkel, err error) {
 	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&wip); err != nil {
+	if err = enc.Encode(&skel); err != nil {
 		return
 	}
 	resp, err := postResponse(u, &data)
