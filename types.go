@@ -215,11 +215,11 @@ type AddrKeychain struct {
 //Typically, wallets can be used wherever an address can be
 //used within the API.
 type Wallet struct {
-	Name      string   `json:"name"`
+	Name      string   `json:"name,omitempty"`
 	Addresses []string `json:"addresses,omitempty"`
 	HD        bool     `json:"hd,omitempty"`
 	ExtPubKey string   `json:"extended_public_key,omitempty"`
-	Subchain  []int    `json:"subchain_indexes"`
+	Subchain  []int    `json:"subchain_indexes,omitempty"`
 }
 
 //Hook represents a WebHook/WebSockets event.
