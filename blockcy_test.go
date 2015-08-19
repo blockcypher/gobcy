@@ -1,3 +1,5 @@
+//Tests for the BlockCypher Go SDK. Test functions
+//try to mirror file names where possible.
 package blockcy
 
 import (
@@ -31,46 +33,8 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-func TestGetChain(t *testing.T) {
-	ch, err := bcy.GetChain()
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", ch)
-	return
-}
-
-func TestGetBlock(t *testing.T) {
-	_, err := bcy.GetBlock(187621, "")
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	bl, err := bcy.GetBlock(0, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4")
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", bl)
-	_, err = bcy.GetBlock(187621, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4")
-	if err == nil {
-		t.Error("Expected error when querying for both height and hash, did not receive one")
-	}
-	return
-}
-
-func TestGetBlockNextTXs(t *testing.T) {
-	//Also tests GetBlockPage directly
-	bl, err := bcy.GetBlockPage(0, "0000cb69e3c85ec1a4a17d8a66634c1cf136acc9dca9a5a71664a593f92bc46e", 0, 1)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", bl)
-	bl2, err := bcy.GetBlockNextTXs(bl)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", bl2)
-}
-
+//TestsGetTXConf runs first, to test
+//Confidence factor
 func TestGetTXConf(t *testing.T) {
 	conf, err := bcy.GetTXConf(txhash2)
 	if err != nil {
@@ -80,26 +44,51 @@ func TestGetTXConf(t *testing.T) {
 	return
 }
 
-func TestGetAddrBal(t *testing.T) {
+func TestBlockchain(t *testing.T) {
+	ch, err := bcy.GetChain()
+	if err != nil {
+		t.Error("GetChain error encountered: ", err)
+	}
+	t.Logf("%+v\n", ch)
+	_, err = bcy.GetBlock(187621, "")
+	if err != nil {
+		t.Error("GetBlock via height error encountered: ", err)
+	}
+	bl, err := bcy.GetBlock(0, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4")
+	if err != nil {
+		t.Error("GetBlock via hash error encountered: ", err)
+	}
+	t.Logf("%+v\n", bl)
+	_, err = bcy.GetBlock(187621, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4")
+	if err == nil {
+		t.Error("Expected error when querying both height and hash in GetBlock, did not receive one")
+	}
+	err = nil
+	bl, err = bcy.GetBlockPage(0, "0000cb69e3c85ec1a4a17d8a66634c1cf136acc9dca9a5a71664a593f92bc46e", 0, 1)
+	if err != nil {
+		t.Error("GetBlockPage error encountered: ", err)
+	}
+	t.Logf("%+v\n", bl)
+	bl2, err := bcy.GetBlockNextTXs(bl)
+	if err != nil {
+		t.Error("GetBlockNextTXs error encountered: ", err)
+	}
+	t.Logf("%+v\n", bl2)
+	return
+}
+
+func TestAddress(t *testing.T) {
 	addr, err := bcy.GetAddrBal(keys1.Address)
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
-	return
-}
-
-func TestGetAddr(t *testing.T) {
-	addr, err := bcy.GetAddr(keys1.Address)
+	addr, err = bcy.GetAddr(keys1.Address)
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
-	return
-}
-
-func TestGetAddrFull(t *testing.T) {
-	addr, err := bcy.GetAddrFull(keys2.Address)
+	addr, err = bcy.GetAddrFull(keys2.Address)
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
