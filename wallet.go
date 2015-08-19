@@ -79,7 +79,7 @@ func (api *API) AddAddrWallet(name string, addrs []string) (wal Wallet, err erro
 	//encode post data into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&Wallet{addresses: addrs}); err != nil {
+	if err = enc.Encode(&Wallet{Addresses: addrs}); err != nil {
 		return
 	}
 	resp, err := postResponse(u, &data)
@@ -99,7 +99,7 @@ func (api *API) AddAddrWallet(name string, addrs []string) (wal Wallet, err erro
 func (api *API) GetAddrWallet(name string, hd bool) (addrs []string, err error) {
 	//Decide whether to query HD or regular Wallet
 	var u *url.URL
-	if req.HD {
+	if hd {
 		u, err = api.buildURL("/wallets/hd/" + name + "/addresses")
 	} else {
 		u, err = api.buildURL("/wallets/" + name + "/addresses")
@@ -150,7 +150,7 @@ func (api *API) GenAddrWallet(name string) (wal Wallet, addr AddrKeychain, err e
 	//weird anonymous struct composition FTW
 	err = dec.Decode(&struct {
 		*Wallet
-		*Addr
+		*AddrKeychain
 	}{&wal, &addr})
 	return
 }

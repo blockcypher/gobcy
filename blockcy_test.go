@@ -16,17 +16,17 @@ func TestMain(m *testing.M) {
 	bcy.Chain = "test"
 	//Set Token
 	bcy.Token = "test-token"
-	//Create/fund the wallets
+	//Create/fund the test addresses
 	var err error
 	keys1, err = bcy.GenAddrKeychain()
 	keys2, err = bcy.GenAddrKeychain()
 	if err != nil {
-		log.Fatal("Error generating test wallets: ", err)
+		log.Fatal("Error generating test addresses: ", err)
 	}
 	txhash1, err = bcy.Faucet(keys1, 1e5)
 	txhash2, err = bcy.Faucet(keys2, 2e5)
 	if err != nil {
-		log.Fatal("Error funding test wallets: ", err)
+		log.Fatal("Error funding test addresses: ", err)
 	}
 	os.Exit(m.Run())
 }
