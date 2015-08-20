@@ -210,16 +210,12 @@ type AddrKeychain struct {
 	ScriptType string   `json:"script_type,omitempty"`
 }
 
-//Wallet represents information about either a standard
-//or HD (hierarchical deterministic) wallet.
+//Wallet represents information about a standard wallet.
 //Typically, wallets can be used wherever an address can be
 //used within the API.
 type Wallet struct {
 	Name      string   `json:"name,omitempty"`
 	Addresses []string `json:"addresses,omitempty"`
-	HD        bool     `json:"hd,omitempty"`
-	ExtPubKey string   `json:"extended_public_key,omitempty"`
-	Subchain  []int    `json:"subchain_indexes,omitempty"`
 }
 
 //Hook represents a WebHook/WebSockets event.

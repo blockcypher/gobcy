@@ -129,7 +129,7 @@ func TestWallet(t *testing.T) {
 	if err != nil {
 		t.Error("DeleteAddrWallet error encountered ", err)
 	}
-	addrs, err := bcy.GetAddrWallet("testwallet", false)
+	addrs, err := bcy.GetAddrWallet("testwallet")
 	if err != nil {
 		t.Error("GetAddrWallet error encountered: ", err)
 	}
@@ -141,7 +141,7 @@ func TestWallet(t *testing.T) {
 		t.Error("GenAddrWallet error encountered: ", err)
 	}
 	t.Logf("%+v\n%+v\n", wal, newAddrKeys)
-	err = bcy.DeleteWallet("testwallet", false)
+	err = bcy.DeleteWallet("testwallet")
 	if err != nil {
 		t.Error("DeleteWallet error encountered: ", err)
 	}
