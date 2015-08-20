@@ -125,7 +125,7 @@ func (api *API) GetAddrWallet(name string, hd bool) (addrs []string, err error) 
 //not work with HD wallets, as their addresses cannot be deleted.
 func (api *API) DeleteAddrWallet(name string, addrs []string) (err error) {
 	u, err := api.buildURLParams("/wallets/"+name+"/addresses",
-		map[string]string{"addresses": strings.Join(addrs, ";")})
+		map[string]string{"address": strings.Join(addrs, ";")})
 	resp, err := deleteResponse(u)
 	if err != nil {
 		return
