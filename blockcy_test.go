@@ -110,6 +110,42 @@ func TestGenAddrMultisig(t *testing.T) {
 		t.Error("Response does not match expected address")
 	}
 	t.Logf("%+v\n", response)
+	return
+}
+
+func TestWallet(t *testing.T) {
+	wal, err := bcy.CreateWallet(Wallet{Name: "testwallet",
+		Addresses: []string{keys1.Address}})
+	if err != nil {
+		t.Error("CreateWallet error encountered: ", err)
+	}
+	t.Logf("%+v\n", wal)
+	wal, err = bcy.AddAddrWallet("testwallet", []string{keys2.Address})
+	if err != nil {
+		t.Error("AddAddrWallet error encountered: ", err)
+	}
+	t.Logf("%+v\n", wal)
+	err = bcy.DeleteAddrWallet("testwallet", []string{keys1.Address})
+	if err != nil {
+		t.Error("DeleteAddrWallet error encountered ", err)
+	}
+	addrs, err := bcy.GetAddrWallet("testwallet", false)
+	if err != nil {
+		t.Error("GetAddrWallet error encountered: ", err)
+	}
+	if addrs[0] != keys2.Address {
+		t.Error("GetAddrWallet response does not match expected addresses")
+	}
+	wal, newAddrKeys, err := bcy.GenAddrWallet("testwallet")
+	if err != nil {
+		t.Error("GenAddrWallet error encountered: ", err)
+	}
+	t.Logf("%+v\n%+v\n", wal, newAddrKeys)
+	err = bcy.DeleteWallet("testwallet", false)
+	if err != nil {
+		t.Error("DeleteWallet error encountered: ", err)
+	}
+	return
 }
 
 func TestTX(t *testing.T) {
@@ -139,42 +175,6 @@ func TestTX(t *testing.T) {
 	return
 }
 
-func TestHooks(t *testing.T) {
-	hook, err := bcy.PostHook(Hook{Event: "new-block", URL: "https://my.domain.com/api/callbacks/doublespend?secret=justbetweenus"})
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", hook)
-	if err = bcy.DeleteHook(hook); err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	hooks, err := bcy.ListHooks()
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	//Should be empty
-	t.Logf("%+v\n", hooks)
-	return
-}
-
-func TestPayment(t *testing.T) {
-	pay, err := bcy.PostPayment(PaymentFwd{Destination: keys1.Address})
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", pay)
-	if err = bcy.DeletePayment(pay); err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	pays, err := bcy.ListPayments()
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	//Should be empty
-	t.Logf("%+v\n", pays)
-	return
-}
-
 func TestMicro(t *testing.T) {
 	mic := MicroTX{Priv: keys2.Private, ToAddr: keys1.Address, Value: 25000}
 	result, err := bcy.SendMicro(mic)
@@ -187,5 +187,41 @@ func TestMicro(t *testing.T) {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", txmic)
+	return
+}
+
+func TestHook(t *testing.T) {
+	hook, err := bcy.PostHook(Hook{Event: "new-block", URL: "https://my.domain.com/api/callbacks/doublespend?secret=justbetweenus"})
+	if err != nil {
+		t.Error("PostHook error encountered: ", err)
+	}
+	t.Logf("%+v\n", hook)
+	if err = bcy.DeleteHook(hook); err != nil {
+		t.Error("DeleteHook error encountered: ", err)
+	}
+	hooks, err := bcy.ListHooks()
+	if err != nil {
+		t.Error("ListHooks error encountered: ", err)
+	}
+	//Should be empty
+	t.Logf("%+v\n", hooks)
+	return
+}
+
+func TestPayment(t *testing.T) {
+	pay, err := bcy.PostPayment(PaymentFwd{Destination: keys1.Address})
+	if err != nil {
+		t.Error("PostPayment error encountered: ", err)
+	}
+	t.Logf("%+v\n", pay)
+	if err = bcy.DeletePayment(pay); err != nil {
+		t.Error("DeletePayment error encountered: ", err)
+	}
+	pays, err := bcy.ListPayments()
+	if err != nil {
+		t.Error("ListPayments error encountered: ", err)
+	}
+	//Should be empty
+	t.Logf("%+v\n", pays)
 	return
 }
