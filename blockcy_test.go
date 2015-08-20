@@ -160,7 +160,7 @@ func TestTX(t *testing.T) {
 	}
 	t.Logf("%+v\n", tx)
 	//Create New TXSkeleton
-	temp := TempNewTX(keys2.Address, keys1.Address, 45000, false)
+	temp := TempNewTX(keys2.Address, keys1.Address, 45000)
 	skel, err := bcy.NewTX(temp)
 	if err != nil {
 		t.Error("NewTX error encountered: ", err)

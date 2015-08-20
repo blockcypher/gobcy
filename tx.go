@@ -57,9 +57,9 @@ func (api *API) GetTXConf(hash string) (conf float64, err error) {
 	return
 }
 
-//TempNewTX creates a template transaction,
-//suitable for use in NewTX.
-func TempNewTX(inAddr string, outAddr string, amount int, confirm bool) (trans TX) {
+//TempNewTX creates a simple template transaction, suitable for
+//use in NewTX. Takes an input/output address and amount.
+func TempNewTX(inAddr string, outAddr string, amount int) (trans TX) {
 	trans.Inputs = make([]TXInput, 1)
 	trans.Outputs = make([]TXOutput, 1)
 	trans.Inputs[0].Addresses = make([]string, 1)
@@ -67,9 +67,6 @@ func TempNewTX(inAddr string, outAddr string, amount int, confirm bool) (trans T
 	trans.Inputs[0].Addresses[0] = inAddr
 	trans.Outputs[0].Addresses[0] = outAddr
 	trans.Outputs[0].Value = amount
-	if confirm {
-		trans.Confirmations = 1
-	}
 	return
 }
 
@@ -80,7 +77,7 @@ func TempNewTX(inAddr string, outAddr string, amount int, confirm bool) (trans T
 //send from a multisig address (/series of public keys).
 //n represents the number of valid signatures required, and m
 //is derived from the number of pubkeys.
-func TempMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int, pubkeys []string) (trans TX, err error) {
+func TempMultiTX(inAddr string, outAddr string, amount int, n int, pubkeys []string) (trans TX, err error) {
 	m := len(pubkeys)
 	if inAddr != "" && outAddr != "" {
 		err = errors.New("TempMultiTX: Can't have both inAddr and outAddr != \"\"")
@@ -105,9 +102,6 @@ func TempMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int,
 		trans.Outputs[0].Addresses[0] = outAddr
 	}
 	trans.Outputs[0].Value = amount
-	if confirm {
-		trans.Confirmations = 1
-	}
 	return
 }
 
