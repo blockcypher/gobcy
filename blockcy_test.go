@@ -159,19 +159,24 @@ func TestTX(t *testing.T) {
 		t.Error("GetTX error encountered: ", err)
 	}
 	t.Logf("%+v\n", tx)
-	//Create and Send TXSkeleton
-	temp := TempNewTX(keys2.Address, keys1.Address, 25000, false)
+	//Create New TXSkeleton
+	temp := TempNewTX(keys2.Address, keys1.Address, 45000, false)
 	skel, err := bcy.NewTX(temp)
 	if err != nil {
 		t.Error("NewTX error encountered: ", err)
 	}
 	t.Logf("%+v\n", skel)
-	/*Will uncomment once client-side signing integrated into SDK
+	//Sign TXSkeleton
+	err = skel.Sign([]string{keys2.Private})
+	if err != nil {
+		t.Error("*TXSkel.Sign error encountered: ", err)
+	}
+	//Send TXSkeleton
 	skel, err = bcy.SendTX(skel)
 	if err != nil {
 		t.Error("SendTX error encountered: ", err)
 	}
-	t.Logf("%+v\n", skel)*/
+	t.Logf("%+v\n", skel)
 	return
 }
 

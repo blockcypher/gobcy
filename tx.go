@@ -2,9 +2,12 @@ package blockcy
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"strconv"
+
+	"github.com/btcsuite/btcd/btcec"
 )
 
 //GetUnTX returns an array of the latest unconfirmed TXs.
@@ -70,21 +73,21 @@ func TempNewTX(inAddr string, outAddr string, amount int, confirm bool) (trans T
 	return
 }
 
-//SkelMultiTX creates a skeleton multisig transaction,
+//TempMultiTX creates a skeleton multisig transaction,
 //suitable for use in NewTX. If outAddr == "", then the
 //returned TX will be a skeleton to fund a multisig address.
 //If inAddr == "", then the returned TX will be a skeleton to
 //send from a multisig address (/series of public keys).
 //n represents the number of valid signatures required, and m
 //is derived from the number of pubkeys.
-func SkelMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int, pubkeys []string) (trans TX, err error) {
+func TempMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int, pubkeys []string) (trans TX, err error) {
 	m := len(pubkeys)
 	if inAddr != "" && outAddr != "" {
-		err = errors.New("SkelMultiTX: Can't have both inAddr and outAddr != \"\"")
+		err = errors.New("TempMultiTX: Can't have both inAddr and outAddr != \"\"")
 		return
 	}
 	if n > m {
-		err = errors.New("SkelMultiTX: n cannot be greater than the number of pubkeys")
+		err = errors.New("TempMultiTX: n cannot be greater than the number of pubkeys")
 		return
 	}
 	scripttype := "multisig-" + strconv.Itoa(n) + "-of-" + strconv.Itoa(m)
@@ -108,8 +111,11 @@ func SkelMultiTX(inAddr string, outAddr string, amount int, confirm bool, n int,
 	return
 }
 
-//NewTX takes a partially formed TX and returns
-//a TXSkel with the data that needs to be signed.
+//NewTX takes a partially formed TX and returns a TXSkel
+//with the data that needs to be signed. Can use TempNewTX
+//or TempMultiTX to streamline input transaction, or customize
+//transaction as described in the BlockCypher docs:
+//http://dev.blockcypher.com/#customizing-transaction-requests
 func (api *API) NewTX(trans TX) (skel TXSkel, err error) {
 	u, err := api.buildURL("/txs/new")
 	if err != nil {
@@ -129,6 +135,36 @@ func (api *API) NewTX(trans TX) (skel TXSkel, err error) {
 	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&skel)
+	return
+}
+
+//Sign takes a hex-encoded string slice of private
+//keys and uses them to sign the ToSign data in a
+//TXSkel, generating the proper Signatures and PubKeys
+//array, both hex-encoded. This is meant as a helper
+//function, and leverages btcd's btcec library.
+func (skel *TXSkel) Sign(priv []string) (err error) {
+	//num of private keys must match len(ToSign)
+	//Often this might mean repeating private keys
+	if len(priv) != len(skel.ToSign) {
+		err = errors.New("*TXSkel.Sign error: number of private keys != length of ToSign array")
+		return
+	}
+	//Loop through keys, append sigs/public key
+	for i, k := range priv {
+		privDat, err := hex.DecodeString(k)
+		tosign, err := hex.DecodeString(skel.ToSign[i])
+		if err != nil {
+			return err
+		}
+		privkey, pubkey := btcec.PrivKeyFromBytes(btcec.S256(), privDat)
+		sig, err := privkey.Sign(tosign)
+		if err != nil {
+			return err
+		}
+		skel.Signatures = append(skel.Signatures, hex.EncodeToString(sig.Serialize()))
+		skel.PubKeys = append(skel.PubKeys, hex.EncodeToString(pubkey.SerializeCompressed()))
+	}
 	return
 }
 
