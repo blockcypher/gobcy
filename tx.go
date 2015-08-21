@@ -110,8 +110,11 @@ func TempMultiTX(inAddr string, outAddr string, amount int, n int, pubkeys []str
 //or TempMultiTX to streamline input transaction, or customize
 //transaction as described in the BlockCypher docs:
 //http://dev.blockcypher.com/#customizing-transaction-requests
-func (api *API) NewTX(trans TX) (skel TXSkel, err error) {
-	u, err := api.buildURL("/txs/new")
+//If verify is true, will include "ToSignTX," which can be used
+//to locally verify the "ToSign" data is valid.
+func (api *API) NewTX(trans TX, verify bool) (skel TXSkel, err error) {
+	u, err := api.buildURLParams("/txs/new",
+		map[string]string{"includeToSignTx": strconv.FormatBool(verify)})
 	if err != nil {
 		return
 	}
