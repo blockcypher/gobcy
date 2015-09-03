@@ -181,17 +181,29 @@ func TestTX(t *testing.T) {
 }
 
 func TestMicro(t *testing.T) {
-	mic := MicroTX{Priv: keys2.Private, ToAddr: keys1.Address, Value: 25000}
-	result, err := bcy.SendMicro(mic)
+	result, err := bcy.SendMicro(MicroTX{Priv: keys2.Private, ToAddr: keys1.Address, Value: 25000})
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", result)
-	txmic, err := bcy.GetTX(result.Hash)
+	//Test public key signing method
+	resultpub, err := bcy.SendMicro(MicroTX{Pubkey: keys2.Public, ToAddr: keys1.Address, Value: 15000})
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
-	t.Logf("%+v\n", txmic)
+	t.Logf("First MicroTX Pubkey call: %+v\n", resultpub)
+	//Sign resultpub
+	err = resultpub.Sign(keys2.Private)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("Signed MicroTX: %+v\n", resultpub)
+	//Send signed resultpub
+	resultpub, err = bcy.SendMicro(resultpub)
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("Final MicroTX Pubkey call: %+v\n", resultpub)
 	return
 }
 

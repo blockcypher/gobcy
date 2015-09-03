@@ -161,7 +161,7 @@ type NullData struct {
 //Where your application model allows it, consider
 //only using public keys with microtransactions,
 //and sign the microtransaction with your private key
-//(without sending to BlockCypher's server.
+//(without sending to BlockCypher's server).
 type MicroTX struct {
 	//Only one of Pubkey/Private/Wif is required
 	Pubkey     string     `json:"from_pubkey,omitempty"`
