@@ -38,22 +38,20 @@ func (api *API) GetTX(hash string) (tx TX, err error) {
 	return
 }
 
-//GetTXConf returns a float [0,1] representing BlockCypher's
-//confidence that an unconfirmed transaction will be confirmed
-//in the next block. If it returns a 1, the transaction has
-//already been confirmed.
-func (api *API) GetTXConf(hash string) (conf float64, err error) {
+//GetTXConf returns a TXConf containing a float [0,1] that
+//represents BlockCypher's confidence that an unconfirmed transaction
+//won't be successfully double-spent against. If the confidence is 1,
+//the transaction has already been confirmed.
+func (api *API) GetTXConf(hash string) (conf TXConf, err error) {
 	u, err := api.buildURL("/txs/" + hash + "/confidence")
 	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into map[string]interface{} then float
-	result := make(map[string]interface{})
+	//decode JSON into TXConf
 	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&result)
-	conf = result["confidence"].(float64)
+	err = dec.Decode(&conf)
 	return
 }
 
