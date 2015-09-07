@@ -95,6 +95,8 @@ type TXOutput struct {
 	Addresses  []string `json:"addresses"`
 	ScriptType string   `json:"script_type,omitempty"`
 	Script     string   `json:"script,omitempty"`
+	DataHex    string   `json:"data_hex,omitempty"`
+	DataString string   `json:"data_string,omitempty"`
 }
 
 //TXConf represents information about the
