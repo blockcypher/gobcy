@@ -68,6 +68,7 @@ type TX struct {
 	VinSize       int        `json:"vin_sz,omitempty"`
 	VoutSize      int        `json:"vout_sz,omitempty"`
 	Hex           string     `json:"hex,omitempty"`
+	DataProtocol  string     `json:"data_protocol,omitempty"`
 	ChangeAddress string     `json:"change_address,omitempty"`
 	NextInputs    string     `json:"next_inputs,omitempty"`
 	NextOutputs   string     `json:"next_outputs,omitempty"`
