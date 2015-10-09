@@ -112,6 +112,7 @@ type TXConf struct {
 //TXRef represents summarized data about a
 //transaction input or output.
 type TXRef struct {
+	Address       string    `json:"address,omitempty"`
 	BlockHeight   int       `json:"block_height"`
 	TXHash        string    `json:"tx_hash"`
 	TXInputN      int       `json:"tx_input_n"`
@@ -199,7 +200,9 @@ type MicroOutput struct {
 //Addr represents information about the state
 //of a public address.
 type Addr struct {
-	Address            string  `json:"address"`
+	Address string `json:"address,omitempty"`
+	Wallet  Wallet `json:"wallet,omitempty"`
+	//HDWallet           HDWallet `json:"hd_wallet,omitempty"`
 	TotalReceived      int     `json:"total_received"`
 	TotalSent          int     `json:"total_sent"`
 	Balance            int     `json:"balance"`

@@ -120,6 +120,14 @@ func TestWallet(t *testing.T) {
 		t.Error("CreateWallet error encountered: ", err)
 	}
 	t.Logf("%+v\n", wal)
+	list, err := bcy.ListWallets()
+	if err != nil {
+		t.Error("ListWallet error encountered: ", err)
+	}
+	if list[0] != wal.Name {
+		t.Error("ListWallet not listing created testwallet: ", list)
+	}
+	t.Logf("%+v\n", list)
 	wal, err = bcy.AddAddrWallet("testwallet", []string{keys2.Address})
 	if err != nil {
 		t.Error("AddAddrWallet error encountered: ", err)

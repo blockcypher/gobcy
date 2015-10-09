@@ -34,6 +34,24 @@ func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
 	return
 }
 
+//ListWallets lists all known Wallets associated with
+//this token/coin/chain.
+func (api *API) ListWallets() (names []string, err error) {
+	u, err := api.buildURL("/wallets")
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	jsonResp := new(struct {
+		list []string `json:"wallet_names"`
+	})
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(jsonResp)
+	names = jsonResp.list
+	return
+}
+
 //GetWallet gets a Wallet based on its name, the associated
 //API token/coin/chain, and whether it's an HD wallet or
 //not.
