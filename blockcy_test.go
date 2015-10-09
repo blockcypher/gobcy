@@ -234,7 +234,7 @@ func TestHook(t *testing.T) {
 }
 
 func TestPayment(t *testing.T) {
-	pay, err := bcy.PostPayment(PaymentFwd{Destination: keys1.Address})
+	pay, err := bcy.CreatePayment(PayFwd{Destination: keys1.Address})
 	if err != nil {
 		t.Error("PostPayment error encountered: ", err)
 	}

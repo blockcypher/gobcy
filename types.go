@@ -264,9 +264,9 @@ type Hook struct {
 	CallbackErrs  int     `json:"callback_errors,omitempty"`
 }
 
-//PaymentFwd represents a reference to
+//PayFwd represents a reference to
 //a Payment Forwarding request.
-type PaymentFwd struct {
+type PayFwd struct {
 	ID             string   `json:"id,omitempty"`
 	Destination    string   `json:"destination"`
 	InputAddr      string   `json:"input_address,omitempty"`

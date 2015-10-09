@@ -11,7 +11,7 @@ import (
 //address. Fastest Address API call, but does not
 //include transaction details.
 func (api *API) GetAddrBal(hash string) (addr Addr, err error) {
-	addr, err := api.GetAddrBalCustom(hash, false)
+	addr, err = api.GetAddrBalCustom(hash, false)
 	return
 }
 
