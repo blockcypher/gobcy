@@ -216,7 +216,7 @@ func TestMicro(t *testing.T) {
 }
 
 func TestHook(t *testing.T) {
-	hook, err := bcy.PostHook(Hook{Event: "new-block", URL: "https://my.domain.com/api/callbacks/doublespend?secret=justbetweenus"})
+	hook, err := bcy.CreateHook(Hook{Event: "new-block", URL: "https://my.domain.com/api/callbacks/doublespend?secret=justbetweenus"})
 	if err != nil {
 		t.Error("PostHook error encountered: ", err)
 	}
