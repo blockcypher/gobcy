@@ -136,17 +136,14 @@ type TXRef struct {
 //hex transactions that need to be signed, and space
 //for the signed transactions and associated public keys.
 type TXSkel struct {
-	Trans      TX          `json:"tx"`
-	ToSign     []string    `json:"tosign"`
-	Signatures []string    `json:"signatures"`
-	PubKeys    []string    `json:"pubkeys,omitempty"`
-	ToSignTX   []string    `json:"tosign_tx,omitempty"`
-	Errors     []txSkelErr `json:"errors,omitempty"`
-}
-
-//used within for JSON serialization.
-type txSkelErr struct {
-	Error string `json:"error,omitempty"`
+	Trans      TX       `json:"tx"`
+	ToSign     []string `json:"tosign"`
+	Signatures []string `json:"signatures"`
+	PubKeys    []string `json:"pubkeys,omitempty"`
+	ToSignTX   []string `json:"tosign_tx,omitempty"`
+	Errors     []struct {
+		Error string `json:"error,omitempty"`
+	} `json:"errors,omitempty"`
 }
 
 //NullData represents the call and return to BlockCypher's
@@ -168,33 +165,25 @@ type NullData struct {
 //(without sending to BlockCypher's server).
 type MicroTX struct {
 	//Only one of Pubkey/Private/Wif is required
-	Pubkey     string        `json:"from_pubkey,omitempty"`
-	Priv       string        `json:"from_private,omitempty"`
-	Wif        string        `json:"from_wif,omitempty"`
-	ToAddr     string        `json:"to_address"`
-	Value      int           `json:"value_satoshis"`
-	ChangeAddr string        `json:"change_address,omitempty"`
-	Wait       bool          `json:"wait_guarantee,omitempty"`
-	ToSign     []string      `json:"tosign,omitempty"`
-	Signatures []string      `json:"signatures,omitempty"`
-	Hash       string        `json:"hash,omitempty"`
-	Inputs     []MicroInput  `json:"inputs,omitempty"`
-	Outputs    []MicroOutput `json:"outputs,omitempty"`
-	Fees       int           `json:"fees,omitempty"`
-}
-
-//MicroInput represents pared down TXInput data
-//within a Microtransaction.
-type MicroInput struct {
-	PrevHash    string `json:"prev_hash"`
-	OutputIndex int    `json:"output_index"`
-}
-
-//MicroOutput represents pared down TXOutput data
-//within a Microtransaction.
-type MicroOutput struct {
-	Value   int    `json:"value"`
-	Address string `json:"address"`
+	Pubkey     string   `json:"from_pubkey,omitempty"`
+	Priv       string   `json:"from_private,omitempty"`
+	Wif        string   `json:"from_wif,omitempty"`
+	ToAddr     string   `json:"to_address"`
+	Value      int      `json:"value_satoshis"`
+	ChangeAddr string   `json:"change_address,omitempty"`
+	Wait       bool     `json:"wait_guarantee,omitempty"`
+	ToSign     []string `json:"tosign,omitempty"`
+	Signatures []string `json:"signatures,omitempty"`
+	Hash       string   `json:"hash,omitempty"`
+	Inputs     []struct {
+		PrevHash    string `json:"prev_hash"`
+		OutputIndex int    `json:"output_index"`
+	} `json:"inputs,omitempty"`
+	Outputs []struct {
+		Value   int    `json:"value"`
+		Address string `json:"address"`
+	} `json:"outputs,omitempty"`
+	Fees int `json:"fees,omitempty"`
 }
 
 //Addr represents information about the state

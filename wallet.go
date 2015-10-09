@@ -46,11 +46,11 @@ func (api *API) ListWallets() (names []string, err error) {
 	}
 	defer resp.Body.Close()
 	jsonResp := new(struct {
-		list []string `json:"wallet_names"`
+		List []string `json:"wallet_names"`
 	})
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(jsonResp)
-	names = jsonResp.list
+	names = jsonResp.List
 	return
 }
 
