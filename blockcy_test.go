@@ -137,7 +137,7 @@ func TestWallet(t *testing.T) {
 	if err != nil {
 		t.Error("DeleteAddrWallet error encountered ", err)
 	}
-	addrs, err := bcy.GetAddrWallet("testwallet")
+	addrs, err := bcy.GetAddrWallet("testwallet", false, false, false, false)
 	if err != nil {
 		t.Error("GetAddrWallet error encountered: ", err)
 	}

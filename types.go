@@ -200,21 +200,21 @@ type MicroOutput struct {
 //Addr represents information about the state
 //of a public address.
 type Addr struct {
-	Address string `json:"address,omitempty"`
-	Wallet  Wallet `json:"wallet,omitempty"`
-	//HDWallet           HDWallet `json:"hd_wallet,omitempty"`
-	TotalReceived      int     `json:"total_received"`
-	TotalSent          int     `json:"total_sent"`
-	Balance            int     `json:"balance"`
-	UnconfirmedBalance int     `json:"unconfirmed_balance"`
-	FinalBalance       int     `json:"final_balance"`
-	NumTX              int     `json:"n_tx"`
-	UnconfirmedNumTX   int     `json:"unconfirmed_n_tx"`
-	FinalNumTX         int     `json:"final_n_tx"`
-	TXs                []TX    `json:"txs,omitempty"`
-	TXRefs             []TXRef `json:"txrefs,omitempty"`
-	UnconfirmedTXRefs  []TXRef `json:"unconfirmed_txrefs,omitempty"`
-	HasMore            bool    `json:"hasMore,omitempty"`
+	Address            string   `json:"address,omitempty"`
+	Wallet             Wallet   `json:"wallet,omitempty"`
+	HDWallet           HDWallet `json:"hd_wallet,omitempty"`
+	TotalReceived      int      `json:"total_received"`
+	TotalSent          int      `json:"total_sent"`
+	Balance            int      `json:"balance"`
+	UnconfirmedBalance int      `json:"unconfirmed_balance"`
+	FinalBalance       int      `json:"final_balance"`
+	NumTX              int      `json:"n_tx"`
+	UnconfirmedNumTX   int      `json:"unconfirmed_n_tx"`
+	FinalNumTX         int      `json:"final_n_tx"`
+	TXs                []TX     `json:"txs,omitempty"`
+	TXRefs             []TXRef  `json:"txrefs,omitempty"`
+	UnconfirmedTXRefs  []TXRef  `json:"unconfirmed_txrefs,omitempty"`
+	HasMore            bool     `json:"hasMore,omitempty"`
 }
 
 //AddrKeychain represents information about a generated
@@ -236,6 +236,23 @@ type AddrKeychain struct {
 type Wallet struct {
 	Name      string   `json:"name,omitempty"`
 	Addresses []string `json:"addresses,omitempty"`
+}
+
+//HDWallet represents information about a Hierarchical Deterministic
+//(HD) wallet. Like regular Wallets, HDWallets can be used wherever an
+//address can be used within the API.
+type HDWallet struct {
+	Name            string `json:"name,omitempty"`
+	ExtPubKey       string `json:"extended_public_key,omitempty"`
+	SubchainIndexes []int  `json:"subchain_indexes,omitempty"`
+	Chains          []struct {
+		ChainAddr []struct {
+			Address string `json:"address,omitempty"`
+			Path    string `json:"path,omitempty"`
+			Public  string `json:"public,omitempty"`
+		} `json:"chain_addresses,omitempty"`
+		Index int `json:"index,omitempty"`
+	} `json:"chains,omitempty"`
 }
 
 //Hook represents a WebHook/WebSockets event.

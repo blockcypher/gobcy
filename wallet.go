@@ -3,6 +3,7 @@ package blockcy
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"strconv"
 	"strings"
 )
@@ -99,8 +100,30 @@ func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal W
 
 //GetAddrWallet returns a slice of addresses associated with
 //a named Wallet, associated with the API token/coin/chain.
-func (api *API) GetAddrWallet(name string) (addrs []string, err error) {
-	u, err := api.buildURL("/wallets/" + name + "/addresses")
+//Offers 4 parameters for customization:
+//  "used," if true will return only used addresses
+//  "unused," if true will return only unused addresses
+//  "zero", if true will return only zero balance addresses
+//  "nonzero", if true will return only nonzero balance addresses
+//"used" and "unused" cannot be true at the same time; the SDK will throw an error.
+//"zero" and "nonzero" cannot be true at the same time; the SDK will throw an error.
+func (api *API) GetAddrWallet(name string, used bool, unused bool, zero bool, nonzero bool) (addrs []string, err error) {
+	params := make(map[string]string)
+	if used && unused {
+		err = errors.New("GetAddrWallet: Unused and used cannot be the same")
+		return
+	}
+	if zero && nonzero {
+		err = errors.New("GetAddrWallet: Zero and nonzero cannot be the same")
+		return
+	}
+	if used != unused {
+		params["used"] = strconv.FormatBool(used)
+	}
+	if zero != nonzero {
+		params["zerobalance"] = strconv.FormatBool(zero)
+	}
+	u, err := api.buildURLParams("/wallets/"+name+"/addresses", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
