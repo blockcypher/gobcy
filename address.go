@@ -11,7 +11,20 @@ import (
 //address. Fastest Address API call, but does not
 //include transaction details.
 func (api *API) GetAddrBal(hash string) (addr Addr, err error) {
-	u, err := api.buildURL("/addrs/" + hash + "/balance")
+	addr, err := api.GetAddrBalCustom(hash, false)
+	return
+}
+
+//GetAddrBalCustom returns balance information for a given public
+//address. Fastest Address API call, but does not
+//include transaction details. Takes one additional parameter
+//compared to GetAddrBal:
+//  "omitWalletAddr," if true will omit wallet addresses if
+//  you're querying a wallet instead of an address. Useful to
+//  speed up the API call for larger wallets.
+func (api *API) GetAddrBalCustom(hash string, omitWalletAddr bool) (addr Addr, err error) {
+	params := map[string]string{"omitWalletAddresses": strconv.FormatBool(omitWalletAddr)}
+	u, err := api.buildURLParams("/addrs/"+hash+"/balance", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -29,14 +42,14 @@ func (api *API) GetAddrBal(hash string) (addr Addr, err error) {
 //type. Returns more information than GetAddrBal, but
 //slightly slower.
 func (api *API) GetAddr(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrCustom(hash, false, 0, 0, 0)
+	addr, err = api.GetAddrCustom(hash, false, 0, 0, 0, false)
 	return
 }
 
 //GetAddrCustom returns information for a given public
 //address, including a slice of confirmed and unconfirmed
 //transaction outpus via the TXRef arrays in the Address
-//type. Takes 4 additional parameters compared to GetAddr:
+//type. Takes 5 additional parameters compared to GetAddr:
 //  "unspent," which if true will only return TXRefs
 //  that are unpsent outputs (UTXOs).
 //  "confirms," which will only return TXRefs
@@ -48,8 +61,11 @@ func (api *API) GetAddr(hash string) (addr Addr, err error) {
 //  "limit," which return this number of TXRefs per call.
 //  The default is 50, maximum is 200. Set it to 0 to ignore
 //  this parameter and use the API-set default.
-func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before int, limit int) (addr Addr, err error) {
-	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent)}
+//  "omitWalletAddr," if true will omit wallet addresses if
+//  you're querying a wallet instead of an address. Useful to
+//  speed up the API call for larger wallets.
+func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before int, limit int, omitWalletAddr bool) (addr Addr, err error) {
+	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr)}
 	if confirms > 0 {
 		params["confirmations"] = strconv.Itoa(confirms)
 	}
@@ -76,14 +92,14 @@ func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before in
 //with this address. Returns more data than GetAddr since
 //it includes full transactions, but slowest Address query.
 func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrFullCustom(hash, false, 0, 0)
+	addr, err = api.GetAddrFullCustom(hash, false, 0, 0, false)
 	return
 }
 
 //GetAddrFullCustom returns information for a given public
 //address, including a slice of TXs associated
 //with this address. Returns more data than GetAddr since
-//it includes full transactions, but slower. Takes 3
+//it includes full transactions, but slower. Takes 4
 //additional parameters compared to GetAddrFull:
 //  "hex," which if true will return the full hex-encoded
 //  raw transaction for each TX. False by default.
@@ -93,8 +109,11 @@ func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
 //  "limit," which return this number of TXs per call.
 //  The default is 10, maximum is 50. Set it to 0 to ignore
 //  this parameter and use the API-set default.
-func (api *API) GetAddrFullCustom(hash string, hex bool, before int, limit int) (addr Addr, err error) {
-	params := map[string]string{"includeHex": strconv.FormatBool(hex)}
+//  "omitWalletAddr," if true will omit wallet addresses if
+//  you're querying a wallet instead of an address. Useful to
+//  speed up the API call for larger wallets.
+func (api *API) GetAddrFullCustom(hash string, hex bool, before int, limit int, omitWalletAddr bool) (addr Addr, err error) {
+	params := map[string]string{"includeHex": strconv.FormatBool(hex), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr)}
 	if before > 0 {
 		params["before"] = strconv.Itoa(before)
 	}

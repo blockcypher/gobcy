@@ -128,7 +128,7 @@ func TestWallet(t *testing.T) {
 		t.Error("ListWallet not listing created testwallet: ", list)
 	}
 	t.Logf("%+v\n", list)
-	wal, err = bcy.AddAddrWallet("testwallet", []string{keys2.Address})
+	wal, err = bcy.AddAddrWallet("testwallet", []string{keys2.Address}, false)
 	if err != nil {
 		t.Error("AddAddrWallet error encountered: ", err)
 	}

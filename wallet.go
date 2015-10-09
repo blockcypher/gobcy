@@ -3,6 +3,7 @@ package blockcy
 import (
 	"bytes"
 	"encoding/json"
+	"strconv"
 	"strings"
 )
 
@@ -69,9 +70,13 @@ func (api *API) GetWallet(name string) (wal Wallet, err error) {
 }
 
 //AddAddrWallet adds a slice of addresses to a named Wallet,
-//associated with the API token/coin/chain.
-func (api *API) AddAddrWallet(name string, addrs []string) (wal Wallet, err error) {
-	u, err := api.buildURL("/wallets/" + name + "/addresses")
+//associated with the API token/coin/chain. In addition to your
+//list of addresses to add, takes one additional parameter:
+//  "omitAddr," if true will omit wallet addresses in your
+//  response. Useful to speed up the API call for larger wallets.
+func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal Wallet, err error) {
+	params := map[string]string{"omitWalletAddresses": strconv.FormatBool(omitAddr)}
+	u, err := api.buildURLParams("/wallets/"+name+"/addresses", params)
 	if err != nil {
 		return
 	}
