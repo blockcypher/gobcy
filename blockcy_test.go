@@ -156,6 +156,42 @@ func TestWallet(t *testing.T) {
 	return
 }
 
+func TestHDWallet(t *testing.T) {
+	wal, err := bcy.CreateHDWallet(HDWallet{Name: "testhdwallet",
+		ExtPubKey: "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8"})
+	if err != nil {
+		t.Error("CreateHDWallet error encountered: ", err)
+	}
+	t.Logf("%+v\n", wal)
+	list, err := bcy.ListHDWallets()
+	if err != nil {
+		t.Error("ListHDWallet error encountered: ", err)
+	}
+	if list[0] != wal.Name {
+		t.Error("ListWallet not listing created testhdwallet: ", list)
+	}
+	t.Logf("%+v\n", list)
+	addrs, err := bcy.GetAddrHDWallet("testhdwallet", false, false, false, false)
+	if err != nil {
+		t.Error("GetAddrHDWallet error encountered: ", err)
+	}
+	newhd := bcy.DeriveAddrHDWallet("testhdwallet", 1, false, 0)
+	if err != nil {
+		t.Error("DeriveAddrHDWallet error encountered: ", err)
+	}
+	t.Logf("%+v\n", newhd)
+	wal, err = bcy.GetHDWallet("testhdwallet")
+	if err != nil {
+		t.Error("GetHDWallet error encountered: ", err)
+	}
+	t.Logf("%+v\n", wal)
+	err = bcy.DeleteHDWallet("testhdwallet")
+	if err != nil {
+		t.Error("DeleteHDWallet error encountered: ", err)
+	}
+	return
+}
+
 func TestTX(t *testing.T) {
 	txs, err := bcy.GetUnTX()
 	if err != nil {
