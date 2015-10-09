@@ -175,7 +175,7 @@ func TestHDWallet(t *testing.T) {
 	if err != nil {
 		t.Error("GetAddrHDWallet error encountered: ", err)
 	}
-	newhd := bcy.DeriveAddrHDWallet("testhdwallet", 1, false, 0)
+	newhd, err := bcy.DeriveAddrHDWallet("testhdwallet", 1, false, 0)
 	if err != nil {
 		t.Error("DeriveAddrHDWallet error encountered: ", err)
 	}
