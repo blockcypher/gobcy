@@ -1,8 +1,8 @@
-//Package blockcy implements a wrapper for the http://blockcypher.com API.
+//Package gobcy implements a wrapper for the http://www.blockcypher.com API.
 //You can use it to interact with addresses, transactions, and blocks from
 //various blockchains, including Bitcoin's main and test3 chains,
 //and the BlockCypher test chain.
-package blockcy
+package gobcy
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ const baseURL = "https://api.blockcypher.com/v1/"
 //All your credentials are stored within an API struct, as are
 //many of the API methods.
 //You can allocate an API struct like so:
-//	bc = blockcy.API{"your-api-token","btc","main"}
+//	bc = gobcy.API{"your-api-token","btc","main"}
 //Then query as you like:
 //	chain = bc.GetChain()
 type API struct {

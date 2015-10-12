@@ -1,6 +1,6 @@
 //Tests for the BlockCypher Go SDK. Test functions
 //try to mirror file names where possible.
-package blockcy
+package gobcy
 
 import (
 	"log"

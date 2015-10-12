@@ -1,4 +1,4 @@
-package blockcy
+package gobcy
 
 import "time"
 
