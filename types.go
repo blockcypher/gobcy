@@ -9,9 +9,7 @@ type Blockchain struct {
 	Height           int       `json:"height"`
 	Hash             string    `json:"hash"`
 	Time             time.Time `json:"time"`
-	LatestURL        string    `json:"latest_url"`
 	PrevHash         string    `json:"previous_hash"`
-	PrevURL          string    `json:"previous_url"`
 	PeerCount        int       `json:"peer_count"`
 	HighFee          int       `json:"high_fee_per_kb"`
 	MediumFee        int       `json:"medium_fee_per_kb"`
@@ -38,7 +36,6 @@ type Block struct {
 	Nonce        int       `json:"nonce"`
 	NumTX        int       `json:"n_tx"`
 	PrevBlock    string    `json:"prev_block"`
-	PrevBlockURL string    `json:"prev_block_url"`
 	MerkleRoot   string    `json:"mrkl_root"`
 	TXids        []string  `json:"txids"`
 	NextTXs      string    `json:"next_txids"`
