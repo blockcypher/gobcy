@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 )
 
-//CreatePayment creates a new Payment forwarding
-//request associated with your API.Token,
-//and returns a result Payment with a
-//BlockCypher-assigned ID.
-func (api *API) CreatePayment(payment PayFwd) (result PayFwd, err error) {
+//CreatePayFwd creates a new PayFwd forwarding
+//request associated with your API.Token, and
+//returns a PayFwd with a BlockCypher-assigned id.
+func (api *API) CreatePayFwd(payment PayFwd) (result PayFwd, err error) {
 	u, err := api.buildURL("/payments")
 	if err != nil {
 		return
@@ -31,9 +30,9 @@ func (api *API) CreatePayment(payment PayFwd) (result PayFwd, err error) {
 	return
 }
 
-//ListPayments returns a slice of Payments
-//associated with your token.
-func (api *API) ListPayments() (payments []PayFwd, err error) {
+//ListPayFwds returns a PayFwds slice
+//associated with your API.Token.
+func (api *API) ListPayFwds() (payments []PayFwd, err error) {
 	u, err := api.buildURL("/payments")
 	resp, err := getResponse(u)
 	if err != nil {
@@ -46,11 +45,24 @@ func (api *API) ListPayments() (payments []PayFwd, err error) {
 	return
 }
 
-//DeletePayment deletes a Payment forwarding
-//request from BlockCypher's database, based
-//on its ID field.
-func (api *API) DeletePayment(payment PayFwd) (err error) {
-	u, err := api.buildURL("/payments/" + payment.ID)
+//GetPayFwd returns a PayFwd based on its id.
+func (api *API) GetPayFwd(id string) (payment PayFwd, err error) {
+	u, err := api.buildURL("/payments/" + id)
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//decode JSON into payments
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&payment)
+	return
+}
+
+//DeletePayFwd deletes a PayFwd request from
+//BlockCypher's database, based on its id.
+func (api *API) DeletePayFwd(id string) (err error) {
+	u, err := api.buildURL("/payments/" + id)
 	resp, err := deleteResponse(u)
 	if err != nil {
 		return

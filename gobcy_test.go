@@ -253,7 +253,7 @@ func TestHook(t *testing.T) {
 		t.Error("PostHook error encountered: ", err)
 	}
 	t.Logf("%+v\n", hook)
-	if err = bcy.DeleteHook(hook); err != nil {
+	if err = bcy.DeleteHook(hook.ID); err != nil {
 		t.Error("DeleteHook error encountered: ", err)
 	}
 	hooks, err := bcy.ListHooks()
@@ -265,18 +265,23 @@ func TestHook(t *testing.T) {
 	return
 }
 
-func TestPayment(t *testing.T) {
-	pay, err := bcy.CreatePayment(PayFwd{Destination: keys1.Address})
+func TestPayFwd(t *testing.T) {
+	pay, err := bcy.CreatePayFwd(PayFwd{Destination: keys1.Address})
 	if err != nil {
-		t.Error("PostPayment error encountered: ", err)
+		t.Error("CreatePayFwd error encountered: ", err)
 	}
 	t.Logf("%+v\n", pay)
-	if err = bcy.DeletePayment(pay); err != nil {
-		t.Error("DeletePayment error encountered: ", err)
-	}
-	pays, err := bcy.ListPayments()
+	pay, err := bcy.GetPayFwd(pay.ID)
 	if err != nil {
-		t.Error("ListPayments error encountered: ", err)
+		t.Error("GetPayFwd error encountered: ", err)
+	}
+	t.Logf("%+v\n", pay)
+	if err = bcy.DeletePayFwd(pay.ID); err != nil {
+		t.Error("DeletePayFwd error encountered: ", err)
+	}
+	pays, err := bcy.ListPayFwds()
+	if err != nil {
+		t.Error("ListPayFwds error encountered: ", err)
 	}
 	//Should be empty
 	t.Logf("%+v\n", pays)
