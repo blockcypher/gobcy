@@ -271,7 +271,7 @@ func TestPayFwd(t *testing.T) {
 		t.Error("CreatePayFwd error encountered: ", err)
 	}
 	t.Logf("%+v\n", pay)
-	pay, err := bcy.GetPayFwd(pay.ID)
+	pay, err = bcy.GetPayFwd(pay.ID)
 	if err != nil {
 		t.Error("GetPayFwd error encountered: ", err)
 	}
