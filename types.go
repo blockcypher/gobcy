@@ -120,6 +120,7 @@ type TXRef struct {
 	DoubleSpend   bool      `json:"double_spend"`
 	DoubleOf      string    `json:"double_of,omitempty"`
 	Confirmations int       `json:"confirmations"`
+	Script        string    `json:"script,omitempty"`
 	RefBalance    int       `json:"ref_balance,omitempty"`
 	Confidence    float64   `json:"confidence,omitempty"`
 	Confirmed     time.Time `json:"confirmed,omitempty"`
