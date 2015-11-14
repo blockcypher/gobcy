@@ -46,6 +46,19 @@ func (api *API) GetAddr(hash string) (addr Addr, err error) {
 	return
 }
 
+//GetAddrNext returns a given Addr's next page of TXRefs,
+//if Addr.HasMore is true. If HasMore is false, will
+//return an error. It assumes default API flags, like GetAddr.
+func (api *API) GetAddrNext(this Addr) (next Addr, err error) {
+	if !this.HasMore {
+		err = errors.New("Func GetAddrNext: this Addr doesn't have more TXRefs according to its HasMore")
+		return
+	}
+	before := this.TXRefs[len(this.TXRefs)-1].BlockHeight
+	next, err = api.GetAddrCustom(this.Address, false, 0, before, 0, false)
+	return
+}
+
 //GetAddrCustom returns information for a given public
 //address, including a slice of confirmed and unconfirmed
 //transaction outpus via the TXRef arrays in the Address
@@ -92,7 +105,20 @@ func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before in
 //with this address. Returns more data than GetAddr since
 //it includes full transactions, but slowest Address query.
 func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrFullCustom(hash, false, 0, 0, false)
+	addr, err = api.GetAddrFullCustom(hash, false, 0, 0, 0, false)
+	return
+}
+
+//GetAddrFullNext returns a given Addr's next page of TXs,
+//if Addr.HasMore is true. If HasMore is false, will
+//return an error. It assumes default API flags, like GetAddrFull.
+func (api *API) GetAddrFullNext(this Addr) (next Addr, err error) {
+	if !this.HasMore {
+		err = errors.New("Func GetAddrFullNext: this Addr doesn't have more TXs according to its HasMore")
+		return
+	}
+	before := this.TXs[len(this.TXs)-1].BlockHeight
+	next, err = api.GetAddrFullCustom(this.Address, false, 0, before, 0, false)
 	return
 }
 
@@ -103,6 +129,9 @@ func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
 //additional parameters compared to GetAddrFull:
 //  "hex," which if true will return the full hex-encoded
 //  raw transaction for each TX. False by default.
+//  "confirms," which will only return TXRefs
+//  that have reached this number of confirmations or more.
+//  Set it to 0 to ignore this parameter.
 //  "before," which will only return transactions below
 //  this height in the blockchain. Useful for paging. Set it
 //  to 0 to ignore this parameter.
@@ -112,8 +141,11 @@ func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
 //  "omitWalletAddr," if true will omit wallet addresses if
 //  you're querying a wallet instead of an address. Useful to
 //  speed up the API call for larger wallets.
-func (api *API) GetAddrFullCustom(hash string, hex bool, before int, limit int, omitWalletAddr bool) (addr Addr, err error) {
+func (api *API) GetAddrFullCustom(hash string, hex bool, confirms int, before int, limit int, omitWalletAddr bool) (addr Addr, err error) {
 	params := map[string]string{"includeHex": strconv.FormatBool(hex), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr)}
+	if confirms > 0 {
+		params["confirmations"] = strconv.Itoa(confirms)
+	}
 	if before > 0 {
 		params["before"] = strconv.Itoa(before)
 	}
