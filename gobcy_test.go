@@ -287,3 +287,21 @@ func TestPayFwd(t *testing.T) {
 	t.Logf("%+v\n", pays)
 	return
 }
+
+func TestMeta(t *testing.T) {
+	err := bcy.PutMeta(keys1.Address, "addr", true, map[string]string{"key": "value"})
+	if err != nil {
+		t.Error("PutMeta error encountered: ", err)
+	}
+	data, err := bcy.GetMeta(keys1.Address, "addr", true)
+	if err != nil {
+		t.Error("GetMeta error encountered: ", err)
+	}
+	if data["key"] != "value" {
+		t.Error("GetMeta error encountered, expected data['key']='value', got: ", data["key"])
+	}
+	err = bcy.DeleteMeta(keys1.Address, "addr")
+	if err != nil {
+		t.Error("DeleteMeta error encountered: ", err)
+	}
+}
