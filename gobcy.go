@@ -60,6 +60,26 @@ func postResponse(target *url.URL, data io.Reader) (resp *http.Response, err err
 	return
 }
 
+//putResponse is a boilerplate for HTTP PUT responses.
+func putResponse(target *url.URL, data io.Reader) (resp *http.Response, err error) {
+	req, err := http.NewRequest("PUT", target.String(), data)
+	if err != nil {
+		return
+	}
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return
+	}
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
+		msg := make(map[string]string)
+		dec := json.NewDecoder(resp.Body)
+		dec.Decode(&msg)
+		resp.Body.Close()
+		err = errors.New(resp.Status + ", Message: " + msg["error"])
+	}
+	return
+}
+
 //deleteResponse is a boilerplate for HTTP DELETE responses.
 func deleteResponse(target *url.URL) (resp *http.Response, err error) {
 	req, err := http.NewRequest("DELETE", target.String(), nil)
