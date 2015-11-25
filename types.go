@@ -209,12 +209,14 @@ type Addr struct {
 //generation API. Large amounts are not recommended to be
 //stored with these addresses.
 type AddrKeychain struct {
-	Address    string   `json:"address,omitempty"`
-	Private    string   `json:"private,omitempty"`
-	Public     string   `json:"public,omitempty"`
-	Wif        string   `json:"wif,omitempty"`
-	PubKeys    []string `json:"pubkeys,omitempty"`
-	ScriptType string   `json:"script_type,omitempty"`
+	Address         string   `json:"address,omitempty"`
+	Private         string   `json:"private,omitempty"`
+	Public          string   `json:"public,omitempty"`
+	Wif             string   `json:"wif,omitempty"`
+	PubKeys         []string `json:"pubkeys,omitempty"`
+	ScriptType      string   `json:"script_type,omitempty"`
+	OriginalAddress string   `json:"original_address,omitempty"`
+	OAPAddress      string   `json:"oap_address,omitempty"`
 }
 
 //Wallet represents information about a standard wallet.
@@ -291,4 +293,36 @@ type Payback struct {
 	DestHash    string `json:"transaction_hash"`
 	InputAddr   string `json:"input_address"`
 	InputHash   string `json:"input_transaction_hash"`
+}
+
+//OAPIssue represents a request for issuance or transfer of
+//an Open Asset on a blockchain.
+type OAPIssue struct {
+	Priv     string `json:"from_private"`
+	ToAddr   string `json:"to_address"`
+	Amount   int    `json:"amount"`
+	Metadata string `json:"metadata,omitempty"`
+}
+
+//OAPTX represents an Open Asset protocol transaction, generated
+//when issuing or transferring assets.
+type OAPTX struct {
+	Ver         int       `json:"ver"`
+	AssetID     string    `json:"assetid"`
+	Hash        string    `json:"hash"`
+	Confirmed   time.Time `json:"confirmed,omitempty"`
+	Received    time.Time `json:"received"`
+	Metadata    string    `json:"oap_meta,omitempty"`
+	DoubleSpend bool      `json:"double_spend"`
+	Inputs      []struct {
+		PrevHash    string `json:"prev_hash"`
+		OutputIndex int    `json:"output_index"`
+		OAPAddress  string `json:"address"`
+		OutputValue int    `json:"output_value"`
+	} `json:"inputs"`
+	Outputs []struct {
+		OAPAddress      string `json:"address"`
+		Value           int    `json:"value"`
+		OrigOutputIndex int    `json:"original_output_index"`
+	} `json:"outputs"`
 }

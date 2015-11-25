@@ -3,9 +3,11 @@
 package gobcy
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
+	"time"
 )
 
 var keys1, keys2 AddrKeychain
@@ -304,4 +306,58 @@ func TestMeta(t *testing.T) {
 	if err != nil {
 		t.Error("DeleteMeta error encountered: ", err)
 	}
+}
+
+func TestAsset(t *testing.T) {
+	oap1, err := bcy.GenAssetKeychain()
+	oap2, err := bcy.GenAssetKeychain()
+	funder, err := bcy.GenAddrKeychain()
+	_, err = bcy.Faucet(funder, 1e6)
+	_, err = bcy.Faucet(oap1, 1e6)
+	if err != nil {
+		t.Error("GenAsset/AddrKeychain or Faucet error encountered: ", err)
+	}
+	tx1, err := bcy.IssueAsset(OAPIssue{funder.Private, oap1.OAPAddress, 9000, ""})
+	if err != nil {
+		t.Error("IssueAsset error encountered: ", err)
+	}
+	//wait until tx1 is confirmed
+	fmt.Printf("Waiting for asset issuance to confirm.")
+	for {
+		conf, err := bcy.GetTXConf(tx1.Hash)
+		if err != nil {
+			t.Logf("Error polling for Issue Asset tx confirmation: ", err)
+			break
+		}
+		if conf.Confidence == 1 {
+			fmt.Printf("\n")
+			break
+		}
+		fmt.Printf(".")
+		time.Sleep(2 * time.Second)
+	}
+	tx2, err := bcy.TransferAsset(OAPIssue{oap1.Private, oap2.OAPAddress, 8999, ""}, tx1.AssetID)
+	if err != nil {
+		t.Error("TransferAsset error encountered: ", err)
+		t.Errorf("Returned OAPTX1:%+v\n", tx1)
+		t.Errorf("Returned OAPTX2:%+v\n", tx2)
+	}
+	txs, err := bcy.ListAssetTXs(tx1.AssetID)
+	if err != nil {
+		t.Error("ListAssetTXs error encountered: ", err)
+		t.Errorf("Returned TXs:%v\n", txs)
+	}
+	checktx, err := bcy.GetAssetTX(tx1.AssetID, tx1.Hash)
+	if err != nil {
+		t.Error("GetAssetTX error encountered: ", err)
+		t.Errorf("Original OAPTX from first issue: %+v\n", tx1)
+		t.Errorf("Returned OAPTX from GetAssetTX endpoint: %+v\n", checktx)
+	}
+	oapaddr, err := bcy.GetAssetAddr(tx1.AssetID, oap1.OAPAddress)
+	if err != nil {
+		t.Error("GetAssetAddr error encountered: ", err)
+		t.Errorf("Original OAPTX from first issue: %+v\n", tx1)
+		t.Errorf("Returned Addr from GetAssetAddr endpoint: %+v\n", oapaddr)
+	}
+	t.Logf("Returned Addr from GetAssetAddr endpoint: %+v\n", oapaddr)
 }

@@ -232,9 +232,16 @@ func (api *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
 		Address string `json:"address"`
 		Amount  int    `json:"amount"`
 	}
+	var addr string
+	//for easy funding/testing of OAPAddresses
+	if a.OriginalAddress != "" {
+		addr = a.OriginalAddress
+	} else {
+		addr = a.Address
+	}
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&FauxAddr{a.Address, amount}); err != nil {
+	if err = enc.Encode(&FauxAddr{addr, amount}); err != nil {
 		return
 	}
 	resp, err := postResponse(u, &data)
