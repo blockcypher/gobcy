@@ -116,7 +116,6 @@ func (api *API) NewTX(trans TX, verify bool) (skel TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&trans); err != nil {
@@ -127,7 +126,6 @@ func (api *API) NewTX(trans TX, verify bool) (skel TXSkel, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&skel)
 	return
@@ -173,7 +171,6 @@ func (api *API) SendTX(skel TXSkel) (trans TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&skel); err != nil {
@@ -184,7 +181,6 @@ func (api *API) SendTX(skel TXSkel) (trans TXSkel, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&trans)
 	return
@@ -197,7 +193,6 @@ func (api *API) PushTX(hex string) (trans TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(map[string]string{"tx": hex}); err != nil {
@@ -208,7 +203,6 @@ func (api *API) PushTX(hex string) (trans TXSkel, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&trans)
 	return
@@ -222,7 +216,6 @@ func (api *API) DecodeTX(hex string) (trans TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(map[string]string{"tx": hex}); err != nil {
@@ -233,7 +226,6 @@ func (api *API) DecodeTX(hex string) (trans TXSkel, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&trans)
 	return

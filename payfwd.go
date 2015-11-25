@@ -13,7 +13,6 @@ func (api *API) CreatePayFwd(payment PayFwd) (result PayFwd, err error) {
 	if err != nil {
 		return
 	}
-	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&payment); err != nil {
@@ -24,7 +23,6 @@ func (api *API) CreatePayFwd(payment PayFwd) (result PayFwd, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&result)
 	return

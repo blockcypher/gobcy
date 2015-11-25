@@ -19,7 +19,6 @@ func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
 	if err != nil {
 		return
 	}
-	//encode post data into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&req); err != nil {
@@ -30,7 +29,6 @@ func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&wal)
 	return
@@ -81,7 +79,6 @@ func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal W
 	if err != nil {
 		return
 	}
-	//encode post data into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&Wallet{Addresses: addrs}); err != nil {
@@ -92,7 +89,6 @@ func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal W
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&wal)
 	return

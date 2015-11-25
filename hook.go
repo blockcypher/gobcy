@@ -13,7 +13,6 @@ func (api *API) CreateHook(hook Hook) (result Hook, err error) {
 	if err != nil {
 		return
 	}
-	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&hook); err != nil {
@@ -24,7 +23,6 @@ func (api *API) CreateHook(hook Hook) (result Hook, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&result)
 	return

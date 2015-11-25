@@ -195,7 +195,6 @@ func (api *API) GenAddrMultisig(multi AddrKeychain) (addr AddrKeychain, err erro
 	if err != nil {
 		return
 	}
-	//encode response into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&multi); err != nil {
@@ -206,7 +205,6 @@ func (api *API) GenAddrMultisig(multi AddrKeychain) (addr AddrKeychain, err erro
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&addr)
 	return

@@ -18,7 +18,6 @@ func (api *API) CreateHDWallet(req HDWallet) (wal HDWallet, err error) {
 	if err != nil {
 		return
 	}
-	//encode post data into ReadWriter
 	var data bytes.Buffer
 	enc := json.NewEncoder(&data)
 	if err = enc.Encode(&req); err != nil {
@@ -29,7 +28,6 @@ func (api *API) CreateHDWallet(req HDWallet) (wal HDWallet, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//Decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&wal)
 	return
