@@ -1,13 +1,13 @@
-/*Package gobcy implements a wrapper for the http://www.blockcypher.com API.
-You can use it to interact with addresses, transactions, and blocks from
-various blockchains, including Bitcoin's main and test3 chains,
-and the BlockCypher test chain.
+//Package gobcy implements a wrapper for the http://www.blockcypher.com API.
+//You can use it to interact with addresses, transactions, and blocks from
+//various blockchains, including Bitcoin's main and test3 chains,
+//and the BlockCypher test chain.
 
-Please note: we assume you use are using a 64-bit architecture for deployment,
-which automatically makes `int` types 64-bit. Without 64-bit ints, some values
-might overflow on certain calls, depending on the blockchain you are querying.
-If you are using a 32-bit system, you can change all `int` types to `int64` to
-explicitly work around this issue.*/
+//Please note: we assume you use are using a 64-bit architecture for deployment,
+//which automatically makes `int` types 64-bit. Without 64-bit ints, some values
+//might overflow on certain calls, depending on the blockchain you are querying.
+//If you are using a 32-bit system, you can change all `int` types to `int64` to
+//explicitly work around this issue.
 package gobcy
 
 import (
