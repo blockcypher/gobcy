@@ -6,7 +6,8 @@ and the BlockCypher test chain.
 Please note: we assume you use are using a 64-bit architecture for deployment,
 which automatically makes `int` types 64-bit. Without 64-bit ints, some values
 might overflow on certain calls, depending on the blockchain you are querying.
-If you are using a 32-bit system, you can change all `int` types to `int64`.*/
+If you are using a 32-bit system, you can change all `int` types to `int64` to
+explicitly work around this issue..*/
 
 package gobcy
 

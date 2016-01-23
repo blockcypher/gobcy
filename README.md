@@ -34,10 +34,7 @@ For more information on the API, check out [BlockCypher's documentation](http://
 
 ## A Warning for 32-Bit Systems
 
-We assume you use are using a 64-bit architecture for deployment,
-which automatically makes `int` types 64-bit, which has been the default behavior since [Go 1.1](https://tip.golang.org/doc/go1.1#int). Without 64-bit ints, some values
-might overflow on certain calls, depending on the blockchain you are querying.
-If you are using a 32-bit system, you can change all `int` types to `int64`.
+We assume you use are using a 64-bit architecture for deployment, which automatically makes `int` types 64-bit, the default behavior since [Go 1.1](https://tip.golang.org/doc/go1.1#int). Without 64-bit ints, some values might overflow on certain calls, depending on the blockchain you are querying. If you are using a 32-bit system, you can change all `int` types to `int64` to explicitly work around this issue.
 
 ## Testing
 
