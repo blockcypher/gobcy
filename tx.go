@@ -38,6 +38,40 @@ func (api *API) GetTX(hash string) (tx TX, err error) {
 	return
 }
 
+//GetTXCustom returns a TX represented by the passed hash,
+//but takes additional parameters compared to GetTX:
+//	"limit," limits number of inputs/outputs. If not set, defaults to 20.
+//	Set it 0 to ignore this parameter.
+//	"instart," filters TX to only include inputs starting at this index.
+//	Set it 0 to ignore this parameter.
+//	"outstart", filters TX to only include outputs starting at this index.
+//	Set it 0 to ignore this parameter.
+//	"includeHex", if true, includes raw-encoded hex transaction.
+//	"includeConfidence," if true, includes confidence information
+//	for unconfirmed transactions.
+func (api *API) GetTXCustom(hash string, limit int, instart int, outstart int, includeHex bool, includeConfidence bool) (tx TX, err error) {
+	params := map[string]string{"includeHex": strconv.FormatBool(includeHex), "includeConfidence": strconv.FormatBool(includeConfidence)}
+	if limit > 0 {
+		params["limit"] = strconv.Itoa(limit)
+	}
+	if instart > 0 {
+		params["instart"] = strconv.Itoa(instart)
+	}
+	if outstart > 0 {
+		params["outstart"] = strconv.Itoa(outstart)
+	}
+	u, err := api.buildURLParams("/txs/"+hash, params)
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//decode JSON into TX
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&tx)
+	return
+}
+
 //GetTXConf returns a TXConf containing a float [0,1] that
 //represents BlockCypher's confidence that an unconfirmed transaction
 //won't be successfully double-spent against. If the confidence is 1,

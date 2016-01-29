@@ -42,7 +42,7 @@ func (api *API) GetAddrBalCustom(hash string, omitWalletAddr bool) (addr Addr, e
 //type. Returns more information than GetAddrBal, but
 //slightly slower.
 func (api *API) GetAddr(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrCustom(hash, false, 0, 0, 0, false)
+	addr, err = api.GetAddrCustom(hash, false, 0, 0, 0, 0, false, false)
 	return
 }
 
@@ -55,7 +55,7 @@ func (api *API) GetAddrNext(this Addr) (next Addr, err error) {
 		return
 	}
 	before := this.TXRefs[len(this.TXRefs)-1].BlockHeight
-	next, err = api.GetAddrCustom(this.Address, false, 0, before, 0, false)
+	next, err = api.GetAddrCustom(this.Address, false, 0, before, 0, 0, false, false)
 	return
 }
 
@@ -71,19 +71,28 @@ func (api *API) GetAddrNext(this Addr) (next Addr, err error) {
 //  "before," which will only return transactions below
 //  this height in the blockchain. Useful for paging. Set it
 //  to 0 to ignore this parameter.
+//	"after," which will only return transaction above
+//	this height in the blockchain. Useful for paging. Set it
+//	to 0 to ignore this parameter.
 //  "limit," which return this number of TXRefs per call.
 //  The default is 50, maximum is 200. Set it to 0 to ignore
 //  this parameter and use the API-set default.
 //  "omitWalletAddr," if true will omit wallet addresses if
 //  you're querying a wallet instead of an address. Useful to
 //  speed up the API call for larger wallets.
-func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before int, limit int, omitWalletAddr bool) (addr Addr, err error) {
-	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr)}
+//	"includeConfidence," if true, includes confidence information
+//	for unconfirmed transactions.
+func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before int,
+	after int, limit int, omitWalletAddr bool, includeConfidence bool) (addr Addr, err error) {
+	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr), "includeConfidence": strconv.FormatBool(includeConfidence)}
 	if confirms > 0 {
 		params["confirmations"] = strconv.Itoa(confirms)
 	}
 	if before > 0 {
 		params["before"] = strconv.Itoa(before)
+	}
+	if after > 0 {
+		params["after"] = strconv.Itoa(after)
 	}
 	if limit > 0 {
 		params["limit"] = strconv.Itoa(limit)
@@ -105,7 +114,7 @@ func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before in
 //with this address. Returns more data than GetAddr since
 //it includes full transactions, but slowest Address query.
 func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrFullCustom(hash, false, 0, 0, 0, false)
+	addr, err = api.GetAddrFullCustom(hash, false, 0, 0, 0, 0, false, false)
 	return
 }
 
@@ -118,7 +127,7 @@ func (api *API) GetAddrFullNext(this Addr) (next Addr, err error) {
 		return
 	}
 	before := this.TXs[len(this.TXs)-1].BlockHeight
-	next, err = api.GetAddrFullCustom(this.Address, false, 0, before, 0, false)
+	next, err = api.GetAddrFullCustom(this.Address, false, 0, 0, before, 0, false, false)
 	return
 }
 
@@ -135,19 +144,28 @@ func (api *API) GetAddrFullNext(this Addr) (next Addr, err error) {
 //  "before," which will only return transactions below
 //  this height in the blockchain. Useful for paging. Set it
 //  to 0 to ignore this parameter.
+//	"after," which will only return transaction above
+//	this height in the blockchain. Useful for paging. Set it
+//	to 0 to ignore this parameter.
 //  "limit," which return this number of TXs per call.
 //  The default is 10, maximum is 50. Set it to 0 to ignore
 //  this parameter and use the API-set default.
 //  "omitWalletAddr," if true will omit wallet addresses if
 //  you're querying a wallet instead of an address. Useful to
 //  speed up the API call for larger wallets.
-func (api *API) GetAddrFullCustom(hash string, hex bool, confirms int, before int, limit int, omitWalletAddr bool) (addr Addr, err error) {
-	params := map[string]string{"includeHex": strconv.FormatBool(hex), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr)}
+//	"includeConfidence," if true, includes confidence information
+//	for unconfirmed transactions.
+func (api *API) GetAddrFullCustom(hash string, hex bool, confirms int, before int, after int,
+	limit int, omitWalletAddr bool, includeConfidence bool) (addr Addr, err error) {
+	params := map[string]string{"includeHex": strconv.FormatBool(hex), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr), "includeConfidence": strconv.FormatBool(includeConfidence)}
 	if confirms > 0 {
 		params["confirmations"] = strconv.Itoa(confirms)
 	}
 	if before > 0 {
 		params["before"] = strconv.Itoa(before)
+	}
+	if after > 0 {
+		params["after"] = strconv.Itoa(after)
 	}
 	if limit > 0 {
 		params["limit"] = strconv.Itoa(limit)
