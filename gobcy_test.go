@@ -18,7 +18,7 @@ func TestMain(m *testing.M) {
 	//Set Coin/Chain to BlockCypher testnet
 	bcy.Coin = "bcy"
 	bcy.Chain = "test"
-	//Set Token
+	//Set Your Token
 	bcy.Token = "test-token"
 	//Create/fund the test addresses
 	var err error

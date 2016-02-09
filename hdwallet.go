@@ -35,7 +35,8 @@ func (api *API) CreateHDWallet(req HDWallet) (wal HDWallet, err error) {
 
 //ListHDWallets lists all known HDWallets associated with
 //this token/coin/chain.
-func (api *API) ListHDWallets() (names []string, err error) {
+//Currently not supported! Use ListWallets() instead.
+/*func (api *API) ListHDWallets() (names []string, err error) {
 	u, err := api.buildURL("/wallets/hd")
 	resp, err := getResponse(u)
 	if err != nil {
@@ -49,7 +50,7 @@ func (api *API) ListHDWallets() (names []string, err error) {
 	err = dec.Decode(jsonResp)
 	names = jsonResp.List
 	return
-}
+}*/
 
 //GetHDWallet gets a HDWallet based on its name
 //and the associated API token/coin/chain.
