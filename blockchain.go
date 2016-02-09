@@ -16,7 +16,6 @@ func (api *API) GetChain() (chain Blockchain, err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into Chain
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&chain)
 	return
@@ -85,7 +84,6 @@ func (api *API) GetBlockPage(height int, hash string, txstart int, limit int) (b
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into Block
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&block)
 	return

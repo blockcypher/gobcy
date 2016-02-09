@@ -139,3 +139,16 @@ func (api *API) buildURLParams(u string, params map[string]string) (target *url.
 	target.RawQuery = values.Encode()
 	return
 }
+
+//checks token usage
+func (api *API) CheckUsage() (usage TokenUsage, err error) {
+	u, err := url.Parse(baseURL + "tokens/" + api.Token)
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&usage)
+	return
+}

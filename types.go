@@ -2,6 +2,22 @@ package gobcy
 
 import "time"
 
+//TokenUsage represents information about
+//the limits and usage against your token.
+type TokenUsage struct {
+	Limits Usage `json:"limits"`
+	Hits   Usage `json:"hits"`
+}
+
+type Usage struct {
+	PerSec       int `json:"api/second"`
+	PerHour      int `json:"api/hour"`
+	HooksPerHour int `json:"hooks/hour"`
+	ConfPerHour  int `json:"confidence/hour"`
+	Hooks        int `json:"hooks"`
+	PayFwds      int `json:"payments"`
+}
+
 //Blockchain represents information about
 //the state of a blockchain.
 type Blockchain struct {

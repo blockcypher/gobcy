@@ -46,6 +46,15 @@ func TestGetTXConf(t *testing.T) {
 	return
 }
 
+func TestUsage(t *testing.T) {
+	usage, err := bcy.CheckUsage()
+	if err != nil {
+		t.Error("Error encountered: ", err)
+	}
+	t.Logf("%+v\n", usage)
+	return
+}
+
 func TestBlockchain(t *testing.T) {
 	ch, err := bcy.GetChain()
 	if err != nil {
