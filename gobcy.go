@@ -106,23 +106,8 @@ func deleteResponse(target *url.URL) (resp *http.Response, err error) {
 	return
 }
 
-//constructs BlockCypher URLs for requests
-func (api *API) buildURL(u string) (target *url.URL, err error) {
-	target, err = url.Parse(baseURL + api.Coin + "/" + api.Chain + u)
-	if err != nil {
-		return
-	}
-	//add token to url, if present
-	if api.Token != "" {
-		values := target.Query()
-		values.Set("token", api.Token)
-		target.RawQuery = values.Encode()
-	}
-	return
-}
-
 //constructs BlockCypher URLs with parameters for requests
-func (api *API) buildURLParams(u string, params map[string]string) (target *url.URL, err error) {
+func (api *API) buildURL(u string, params map[string]string) (target *url.URL, err error) {
 	target, err = url.Parse(baseURL + api.Coin + "/" + api.Chain + u)
 	if err != nil {
 		return

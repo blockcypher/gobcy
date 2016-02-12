@@ -17,7 +17,7 @@ import (
 //again with the signed data, which will then return
 //a proper hash.
 func (api *API) SendMicro(mic MicroTX) (result MicroTX, err error) {
-	u, err := api.buildURL("/txs/micro")
+	u, err := api.buildURL("/txs/micro", nil)
 	if err != nil {
 		return
 	}

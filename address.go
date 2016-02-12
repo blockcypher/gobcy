@@ -10,21 +10,8 @@ import (
 //GetAddrBal returns balance information for a given public
 //address. Fastest Address API call, but does not
 //include transaction details.
-func (api *API) GetAddrBal(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrBalCustom(hash, false)
-	return
-}
-
-//GetAddrBalCustom returns balance information for a given public
-//address. Fastest Address API call, but does not
-//include transaction details. Takes one additional parameter
-//compared to GetAddrBal:
-//  "omitWalletAddr," if true will omit wallet addresses if
-//  you're querying a wallet instead of an address. Useful to
-//  speed up the API call for larger wallets.
-func (api *API) GetAddrBalCustom(hash string, omitWalletAddr bool) (addr Addr, err error) {
-	params := map[string]string{"omitWalletAddresses": strconv.FormatBool(omitWalletAddr)}
-	u, err := api.buildURLParams("/addrs/"+hash+"/balance", params)
+func (api *API) GetAddrBal(hash string, params map[string]string) (addr Addr, err error) {
+	u, err := api.buildURL("/addrs/"+hash+"/balance", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -41,71 +28,28 @@ func (api *API) GetAddrBalCustom(hash string, omitWalletAddr bool) (addr Addr, e
 //transaction outpus via the TXRef arrays in the Address
 //type. Returns more information than GetAddrBal, but
 //slightly slower.
-func (api *API) GetAddr(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrCustom(hash, false, 0, 0, 0, 0, false, false)
+func (api *API) GetAddr(hash string, params map[string]string) (addr Addr, err error) {
+	u, err := api.buildURL("/addrs/"+hash, params)
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&addr)
 	return
 }
 
 //GetAddrNext returns a given Addr's next page of TXRefs,
 //if Addr.HasMore is true. If HasMore is false, will
-//return an error. It assumes default API flags, like GetAddr.
+//return an error. It assumes default API URL parameters.
 func (api *API) GetAddrNext(this Addr) (next Addr, err error) {
 	if !this.HasMore {
 		err = errors.New("Func GetAddrNext: this Addr doesn't have more TXRefs according to its HasMore")
 		return
 	}
 	before := this.TXRefs[len(this.TXRefs)-1].BlockHeight
-	next, err = api.GetAddrCustom(this.Address, false, 0, before, 0, 0, false, false)
-	return
-}
-
-//GetAddrCustom returns information for a given public
-//address, including a slice of confirmed and unconfirmed
-//transaction outpus via the TXRef arrays in the Address
-//type. Takes 5 additional parameters compared to GetAddr:
-//  "unspent," which if true will only return TXRefs
-//  that are unpsent outputs (UTXOs).
-//  "confirms," which will only return TXRefs
-//  that have reached this number of confirmations or more.
-//  Set it to 0 to ignore this parameter.
-//  "before," which will only return transactions below
-//  this height in the blockchain. Useful for paging. Set it
-//  to 0 to ignore this parameter.
-//	"after," which will only return transaction above
-//	this height in the blockchain. Useful for paging. Set it
-//	to 0 to ignore this parameter.
-//  "limit," which return this number of TXRefs per call.
-//  The default is 50, maximum is 200. Set it to 0 to ignore
-//  this parameter and use the API-set default.
-//  "omitWalletAddr," if true will omit wallet addresses if
-//  you're querying a wallet instead of an address. Useful to
-//  speed up the API call for larger wallets.
-//	"includeConfidence," if true, includes confidence information
-//	for unconfirmed transactions.
-func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before int,
-	after int, limit int, omitWalletAddr bool, includeConfidence bool) (addr Addr, err error) {
-	params := map[string]string{"unspentOnly": strconv.FormatBool(unspent), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr), "includeConfidence": strconv.FormatBool(includeConfidence)}
-	if confirms > 0 {
-		params["confirmations"] = strconv.Itoa(confirms)
-	}
-	if before > 0 {
-		params["before"] = strconv.Itoa(before)
-	}
-	if after > 0 {
-		params["after"] = strconv.Itoa(after)
-	}
-	if limit > 0 {
-		params["limit"] = strconv.Itoa(limit)
-	}
-	u, err := api.buildURLParams("/addrs/"+hash, params)
-	resp, err := getResponse(u)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	//decode JSON into Addr
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&addr)
+	next, err = api.GetAddr(this.Address, map[string]string{"before": strconv.Itoa(before)})
 	return
 }
 
@@ -113,64 +57,8 @@ func (api *API) GetAddrCustom(hash string, unspent bool, confirms int, before in
 //address, including a slice of TXs associated
 //with this address. Returns more data than GetAddr since
 //it includes full transactions, but slowest Address query.
-func (api *API) GetAddrFull(hash string) (addr Addr, err error) {
-	addr, err = api.GetAddrFullCustom(hash, false, 0, 0, 0, 0, false, false)
-	return
-}
-
-//GetAddrFullNext returns a given Addr's next page of TXs,
-//if Addr.HasMore is true. If HasMore is false, will
-//return an error. It assumes default API flags, like GetAddrFull.
-func (api *API) GetAddrFullNext(this Addr) (next Addr, err error) {
-	if !this.HasMore {
-		err = errors.New("Func GetAddrFullNext: this Addr doesn't have more TXs according to its HasMore")
-		return
-	}
-	before := this.TXs[len(this.TXs)-1].BlockHeight
-	next, err = api.GetAddrFullCustom(this.Address, false, 0, 0, before, 0, false, false)
-	return
-}
-
-//GetAddrFullCustom returns information for a given public
-//address, including a slice of TXs associated
-//with this address. Returns more data than GetAddr since
-//it includes full transactions, but slower. Takes 4
-//additional parameters compared to GetAddrFull:
-//  "hex," which if true will return the full hex-encoded
-//  raw transaction for each TX. False by default.
-//  "confirms," which will only return TXRefs
-//  that have reached this number of confirmations or more.
-//  Set it to 0 to ignore this parameter.
-//  "before," which will only return transactions below
-//  this height in the blockchain. Useful for paging. Set it
-//  to 0 to ignore this parameter.
-//	"after," which will only return transaction above
-//	this height in the blockchain. Useful for paging. Set it
-//	to 0 to ignore this parameter.
-//  "limit," which return this number of TXs per call.
-//  The default is 10, maximum is 50. Set it to 0 to ignore
-//  this parameter and use the API-set default.
-//  "omitWalletAddr," if true will omit wallet addresses if
-//  you're querying a wallet instead of an address. Useful to
-//  speed up the API call for larger wallets.
-//	"includeConfidence," if true, includes confidence information
-//	for unconfirmed transactions.
-func (api *API) GetAddrFullCustom(hash string, hex bool, confirms int, before int, after int,
-	limit int, omitWalletAddr bool, includeConfidence bool) (addr Addr, err error) {
-	params := map[string]string{"includeHex": strconv.FormatBool(hex), "omitWalletAddresses": strconv.FormatBool(omitWalletAddr), "includeConfidence": strconv.FormatBool(includeConfidence)}
-	if confirms > 0 {
-		params["confirmations"] = strconv.Itoa(confirms)
-	}
-	if before > 0 {
-		params["before"] = strconv.Itoa(before)
-	}
-	if after > 0 {
-		params["after"] = strconv.Itoa(after)
-	}
-	if limit > 0 {
-		params["limit"] = strconv.Itoa(limit)
-	}
-	u, err := api.buildURLParams("/addrs/"+hash+"/full", params)
+func (api *API) GetAddrFull(hash string, params map[string]string) (addr Addr, err error) {
+	u, err := api.buildURL("/addrs/"+hash+"/full", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -179,6 +67,19 @@ func (api *API) GetAddrFullCustom(hash string, hex bool, confirms int, before in
 	//decode JSON into Addr
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&addr)
+	return
+}
+
+//GetAddrFullNext returns a given Addr's next page of TXs,
+//if Addr.HasMore is true. If HasMore is false, will
+//return an error. It assumes default API URL parameters, like GetAddrFull.
+func (api *API) GetAddrFullNext(this Addr) (next Addr, err error) {
+	if !this.HasMore {
+		err = errors.New("Func GetAddrFullNext: this Addr doesn't have more TXs according to its HasMore")
+		return
+	}
+	before := this.TXs[len(this.TXs)-1].BlockHeight
+	next, err = api.GetAddr(this.Address, map[string]string{"before": strconv.Itoa(before)})
 	return
 }
 
@@ -187,7 +88,7 @@ func (api *API) GetAddrFullCustom(hash string, hex bool, confirms int, before in
 //this call must be made over SSL, and it is not recommended to keep
 //large amounts in these addresses, or for very long.
 func (api *API) GenAddrKeychain() (pair AddrKeychain, err error) {
-	u, err := api.buildURL("/addrs")
+	u, err := api.buildURL("/addrs", nil)
 	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
@@ -209,7 +110,7 @@ func (api *API) GenAddrMultisig(multi AddrKeychain) (addr AddrKeychain, err erro
 		err = errors.New("GenAddrMultisig: PubKeys or ScriptType are empty.")
 		return
 	}
-	u, err := api.buildURL("/addrs")
+	u, err := api.buildURL("/addrs", nil)
 	if err != nil {
 		return
 	}
@@ -240,7 +141,7 @@ func (api *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
 		err = errors.New("Faucet: Cannot fund with more than 10,000,000 coins at a time.")
 		return
 	}
-	u, err := api.buildURL("/faucet")
+	u, err := api.buildURL("/faucet", nil)
 	if err != nil {
 		return
 	}

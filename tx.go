@@ -12,61 +12,26 @@ import (
 
 //GetUnTX returns an array of the latest unconfirmed TXs.
 func (api *API) GetUnTX() (txs []TX, err error) {
-	u, err := api.buildURL("/txs")
+	u, err := api.buildURL("/txs", nil)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into []TX
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&txs)
 	return
 }
 
-//GetTX returns a TX represented by the passed hash.
-func (api *API) GetTX(hash string) (tx TX, err error) {
-	u, err := api.buildURL("/txs/" + hash)
+//GetTX returns a TX represented by the passed hash. Takes
+//an optionally-nil URL parameter map.
+func (api *API) GetTX(hash string, params map[string]string) (tx TX, err error) {
+	u, err := api.buildURL("/txs/"+hash, params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into TX
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&tx)
-	return
-}
-
-//GetTXCustom returns a TX represented by the passed hash,
-//but takes additional parameters compared to GetTX:
-//	"limit," limits number of inputs/outputs. If not set, defaults to 20.
-//	Set it 0 to ignore this parameter.
-//	"instart," filters TX to only include inputs starting at this index.
-//	Set it 0 to ignore this parameter.
-//	"outstart", filters TX to only include outputs starting at this index.
-//	Set it 0 to ignore this parameter.
-//	"includeHex", if true, includes raw-encoded hex transaction.
-//	"includeConfidence," if true, includes confidence information
-//	for unconfirmed transactions.
-func (api *API) GetTXCustom(hash string, limit int, instart int, outstart int, includeHex bool, includeConfidence bool) (tx TX, err error) {
-	params := map[string]string{"includeHex": strconv.FormatBool(includeHex), "includeConfidence": strconv.FormatBool(includeConfidence)}
-	if limit > 0 {
-		params["limit"] = strconv.Itoa(limit)
-	}
-	if instart > 0 {
-		params["instart"] = strconv.Itoa(instart)
-	}
-	if outstart > 0 {
-		params["outstart"] = strconv.Itoa(outstart)
-	}
-	u, err := api.buildURLParams("/txs/"+hash, params)
-	resp, err := getResponse(u)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	//decode JSON into TX
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&tx)
 	return
@@ -77,13 +42,12 @@ func (api *API) GetTXCustom(hash string, limit int, instart int, outstart int, i
 //won't be successfully double-spent against. If the confidence is 1,
 //the transaction has already been confirmed.
 func (api *API) GetTXConf(hash string) (conf TXConf, err error) {
-	u, err := api.buildURL("/txs/" + hash + "/confidence")
+	u, err := api.buildURL("/txs/"+hash+"/confidence", nil)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into TXConf
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&conf)
 	return
@@ -145,7 +109,7 @@ func TempMultiTX(inAddr string, outAddr string, amount int, n int, pubkeys []str
 //If verify is true, will include "ToSignTX," which can be used
 //to locally verify the "ToSign" data is valid.
 func (api *API) NewTX(trans TX, verify bool) (skel TXSkel, err error) {
-	u, err := api.buildURLParams("/txs/new",
+	u, err := api.buildURL("/txs/new",
 		map[string]string{"includeToSignTx": strconv.FormatBool(verify)})
 	if err != nil {
 		return
@@ -201,7 +165,7 @@ func (skel *TXSkel) Sign(priv []string) (err error) {
 //and PubKeys. PubKeys should not be included in the
 //special case of multi-sig addresses.
 func (api *API) SendTX(skel TXSkel) (trans TXSkel, err error) {
-	u, err := api.buildURL("/txs/send")
+	u, err := api.buildURL("/txs/send", nil)
 	if err != nil {
 		return
 	}
@@ -223,7 +187,7 @@ func (api *API) SendTX(skel TXSkel) (trans TXSkel, err error) {
 //PushTX takes a hex-encoded transaction string
 //and pushes it directly to the Coin/Chain network.
 func (api *API) PushTX(hex string) (trans TXSkel, err error) {
-	u, err := api.buildURL("/txs/push")
+	u, err := api.buildURL("/txs/push", nil)
 	if err != nil {
 		return
 	}
@@ -246,7 +210,7 @@ func (api *API) PushTX(hex string) (trans TXSkel, err error) {
 //and decodes it into a TX object, without sending
 //it along to the Coin/Chain network.
 func (api *API) DecodeTX(hex string) (trans TXSkel, err error) {
-	u, err := api.buildURL("/txs/decode")
+	u, err := api.buildURL("/txs/decode", nil)
 	if err != nil {
 		return
 	}

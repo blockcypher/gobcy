@@ -9,7 +9,7 @@ import (
 //with your API.Token, and returns a WebHook
 //with a BlockCypher-assigned id.
 func (api *API) CreateHook(hook Hook) (result Hook, err error) {
-	u, err := api.buildURL("/hooks")
+	u, err := api.buildURL("/hooks", nil)
 	if err != nil {
 		return
 	}
@@ -31,7 +31,7 @@ func (api *API) CreateHook(hook Hook) (result Hook, err error) {
 //ListHooks returns a slice of WebHooks
 //associated with your API.Token.
 func (api *API) ListHooks() (hooks []Hook, err error) {
-	u, err := api.buildURL("/hooks")
+	u, err := api.buildURL("/hooks", nil)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -45,7 +45,7 @@ func (api *API) ListHooks() (hooks []Hook, err error) {
 
 //GetHook returns a WebHook by its id.
 func (api *API) GetHook(id string) (hook Hook, err error) {
-	u, err := api.buildURL("/hooks/" + id)
+	u, err := api.buildURL("/hooks/"+id, nil)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -60,7 +60,7 @@ func (api *API) GetHook(id string) (hook Hook, err error) {
 //DeleteHook deletes a WebHook notification
 //from BlockCypher's database, based on its id.
 func (api *API) DeleteHook(id string) (err error) {
-	u, err := api.buildURL("/hooks/" + id)
+	u, err := api.buildURL("/hooks/"+id, nil)
 	resp, err := deleteResponse(u)
 	if err != nil {
 		return

@@ -23,7 +23,7 @@ func (api *API) GetMeta(hash string, kind string, private bool) (meta map[string
 		return
 	}
 	params := map[string]string{"private": strconv.FormatBool(private)}
-	u, err := api.buildURLParams("/"+kind+"s/"+hash+"/meta", params)
+	u, err := api.buildURL("/"+kind+"s/"+hash+"/meta", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -50,7 +50,7 @@ func (api *API) PutMeta(hash string, kind string, private bool, meta map[string]
 		return
 	}
 	params := map[string]string{"private": strconv.FormatBool(private)}
-	u, err := api.buildURLParams("/"+kind+"s/"+hash+"/meta", params)
+	u, err := api.buildURL("/"+kind+"s/"+hash+"/meta", params)
 	if err != nil {
 		return
 	}
@@ -79,7 +79,7 @@ func (api *API) DeleteMeta(hash string, kind string) (err error) {
 		err = errors.New(fmt.Sprintf("Func DeleteMeta: kind an invalid type: '%v'. Needs to be 'addr', 'tx', or 'block'", kind))
 		return
 	}
-	u, err := api.buildURL("/" + kind + "s/" + hash + "/meta")
+	u, err := api.buildURL("/"+kind+"s/"+hash+"/meta", nil)
 	resp, err := deleteResponse(u)
 	if err != nil {
 		return

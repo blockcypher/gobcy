@@ -61,21 +61,21 @@ func TestBlockchain(t *testing.T) {
 		t.Error("GetChain error encountered: ", err)
 	}
 	t.Logf("%+v\n", ch)
-	_, err = bcy.GetBlock(187621, "")
+	_, err = bcy.GetBlock(187621, "", nil)
 	if err != nil {
 		t.Error("GetBlock via height error encountered: ", err)
 	}
-	bl, err := bcy.GetBlock(0, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4")
+	bl, err := bcy.GetBlock(0, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4", nil)
 	if err != nil {
 		t.Error("GetBlock via hash error encountered: ", err)
 	}
 	t.Logf("%+v\n", bl)
-	_, err = bcy.GetBlock(187621, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4")
+	_, err = bcy.GetBlock(187621, "0000ffeb0031885f2292475eac7f9c6f7bf5057e3b0017a09cd1994e71b431a4", nil)
 	if err == nil {
 		t.Error("Expected error when querying both height and hash in GetBlock, did not receive one")
 	}
 	err = nil
-	bl, err = bcy.GetBlockPage(0, "0000cb69e3c85ec1a4a17d8a66634c1cf136acc9dca9a5a71664a593f92bc46e", 0, 1)
+	bl, err = bcy.GetBlock(0, "0000cb69e3c85ec1a4a17d8a66634c1cf136acc9dca9a5a71664a593f92bc46e", map[string]string{"txstart": "0", "limit": "1"})
 	if err != nil {
 		t.Error("GetBlockPage error encountered: ", err)
 	}
@@ -89,17 +89,17 @@ func TestBlockchain(t *testing.T) {
 }
 
 func TestAddress(t *testing.T) {
-	addr, err := bcy.GetAddrBal(keys1.Address)
+	addr, err := bcy.GetAddrBal(keys1.Address, nil)
 	if err != nil {
 		t.Error("GetAddrBal error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
-	addr, err = bcy.GetAddr(keys1.Address)
+	addr, err = bcy.GetAddr(keys1.Address, nil)
 	if err != nil {
 		t.Error("GetAddr error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
-	addr, err = bcy.GetAddrFull(keys2.Address)
+	addr, err = bcy.GetAddrFull(keys2.Address, nil)
 	if err != nil {
 		t.Error("GetAddrFull error encountered: ", err)
 	}
@@ -145,7 +145,7 @@ func TestWallet(t *testing.T) {
 	if err != nil {
 		t.Error("DeleteAddrWallet error encountered ", err)
 	}
-	addrs, err := bcy.GetAddrWallet("testwallet", false, false, false, false)
+	addrs, err := bcy.GetAddrWallet("testwallet", nil)
 	if err != nil {
 		t.Error("GetAddrWallet error encountered: ", err)
 	}
@@ -177,12 +177,12 @@ func TestHDWallet(t *testing.T) {
 		t.Error("ListHDWallet error encountered: ", err)
 	}
 	t.Logf("%+v\n", list)*/
-	addrs, err := bcy.GetAddrHDWallet("testhdwallet", false, false, false, false)
+	addrs, err := bcy.GetAddrHDWallet("testhdwallet", nil)
 	if err != nil {
 		t.Error("GetAddrHDWallet error encountered: ", err)
 	}
 	t.Logf("%+v\n", addrs)
-	newhd, err := bcy.DeriveAddrHDWallet("testhdwallet", 1, false, 0)
+	newhd, err := bcy.DeriveAddrHDWallet("testhdwallet", nil)
 	if err != nil {
 		t.Error("DeriveAddrHDWallet error encountered: ", err)
 	}
@@ -205,7 +205,7 @@ func TestTX(t *testing.T) {
 		t.Error("GetUnTX error encountered: ", err)
 	}
 	t.Logf("%+v\n", txs)
-	tx, err := bcy.GetTX(txhash1)
+	tx, err := bcy.GetTX(txhash1, nil)
 	if err != nil {
 		t.Error("GetTX error encountered: ", err)
 	}

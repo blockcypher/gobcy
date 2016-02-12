@@ -3,7 +3,6 @@ package gobcy
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"strconv"
 	"strings"
 )
@@ -13,9 +12,9 @@ import (
 //in the API where an Address might be used (just use
 //the wallet name instead). For example, with checking
 //a wallet name balance:
-//  addr, err := api.GetAddrBal("your-wallet-name")
+//  addr, err := api.GetAddrBal("your-wallet-name", nil)
 func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
-	u, err := api.buildURL("/wallets")
+	u, err := api.buildURL("/wallets", nil)
 	if err != nil {
 		return
 	}
@@ -37,7 +36,7 @@ func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
 //ListWallets lists all known Wallets associated with
 //this token/coin/chain.
 func (api *API) ListWallets() (names []string, err error) {
-	u, err := api.buildURL("/wallets")
+	u, err := api.buildURL("/wallets", nil)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -56,13 +55,12 @@ func (api *API) ListWallets() (names []string, err error) {
 //API token/coin/chain, and whether it's an HD wallet or
 //not.
 func (api *API) GetWallet(name string) (wal Wallet, err error) {
-	u, err := api.buildURL("/wallets/" + name)
+	u, err := api.buildURL("/wallets/"+name, nil)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&wal)
 	return
@@ -75,7 +73,7 @@ func (api *API) GetWallet(name string) (wal Wallet, err error) {
 //  response. Useful to speed up the API call for larger wallets.
 func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal Wallet, err error) {
 	params := map[string]string{"omitWalletAddresses": strconv.FormatBool(omitAddr)}
-	u, err := api.buildURLParams("/wallets/"+name+"/addresses", params)
+	u, err := api.buildURL("/wallets/"+name+"/addresses", params)
 	if err != nil {
 		return
 	}
@@ -96,36 +94,14 @@ func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal W
 
 //GetAddrWallet returns a slice of addresses associated with
 //a named Wallet, associated with the API token/coin/chain.
-//Offers 4 parameters for customization:
-//  "used," if true will return only used addresses
-//  "unused," if true will return only unused addresses
-//  "zero", if true will return only zero balance addresses
-//  "nonzero", if true will return only nonzero balance addresses
-//"used" and "unused" cannot be true at the same time; the SDK will throw an error.
-//"zero" and "nonzero" cannot be true at the same time; the SDK will throw an error.
-func (api *API) GetAddrWallet(name string, used bool, unused bool, zero bool, nonzero bool) (addrs []string, err error) {
-	params := make(map[string]string)
-	if used && unused {
-		err = errors.New("GetAddrWallet: Unused and used cannot be the same")
-		return
-	}
-	if zero && nonzero {
-		err = errors.New("GetAddrWallet: Zero and nonzero cannot be the same")
-		return
-	}
-	if used != unused {
-		params["used"] = strconv.FormatBool(used)
-	}
-	if zero != nonzero {
-		params["zerobalance"] = strconv.FormatBool(zero)
-	}
-	u, err := api.buildURLParams("/wallets/"+name+"/addresses", params)
+//Takes an optionally-nil URL parameter map.
+func (api *API) GetAddrWallet(name string, params map[string]string) (addrs []string, err error) {
+	u, err := api.buildURL("/wallets/"+name+"/addresses", params)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into result
 	var wal Wallet
 	dec := json.NewDecoder(resp.Body)
 	err = dec.Decode(&wal)
@@ -136,7 +112,7 @@ func (api *API) GetAddrWallet(name string, used bool, unused bool, zero bool, no
 //DeleteAddrWallet deletes a slice of addresses associated with
 //a named Wallet, associated with the API token/coin/chain.
 func (api *API) DeleteAddrWallet(name string, addrs []string) (err error) {
-	u, err := api.buildURLParams("/wallets/"+name+"/addresses",
+	u, err := api.buildURL("/wallets/"+name+"/addresses",
 		map[string]string{"address": strings.Join(addrs, ";")})
 	resp, err := deleteResponse(u)
 	if err != nil {
@@ -150,13 +126,12 @@ func (api *API) DeleteAddrWallet(name string, addrs []string) (err error) {
 //associated with the API token/coin/chain. Also returns the
 //private/WIF/public key of address via an Address Keychain.
 func (api *API) GenAddrWallet(name string) (wal Wallet, addr AddrKeychain, err error) {
-	u, err := api.buildURL("/wallets/" + name + "/addresses/generate")
+	u, err := api.buildURL("/wallets/"+name+"/addresses/generate", nil)
 	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	//decode JSON into result
 	dec := json.NewDecoder(resp.Body)
 	//weird anonymous struct composition FTW
 	err = dec.Decode(&struct {
@@ -169,7 +144,7 @@ func (api *API) GenAddrWallet(name string) (wal Wallet, addr AddrKeychain, err e
 //DeleteWallet deletes a named wallet associated with the
 //API token/coin/chain.
 func (api *API) DeleteWallet(name string) (err error) {
-	u, err := api.buildURL("/wallets/" + name)
+	u, err := api.buildURL("/wallets/"+name, nil)
 	resp, err := deleteResponse(u)
 	if err != nil {
 		return

@@ -10,7 +10,7 @@ import (
 //GetChain returns the current state of the
 //configured Coin/Chain.
 func (api *API) GetChain() (chain Blockchain, err error) {
-	u, err := api.buildURL("")
+	u, err := api.buildURL("", nil)
 	resp, err := getResponse(u)
 	if err != nil {
 		return
@@ -24,8 +24,25 @@ func (api *API) GetChain() (chain Blockchain, err error) {
 //GetBlock returns a Block based on either height
 //or hash. If both height and hash are sent, it will
 //throw an error.
-func (api *API) GetBlock(height int, hash string) (block Block, err error) {
-	block, err = api.GetBlockPage(height, hash, 0, 0)
+func (api *API) GetBlock(height int, hash string, params map[string]string) (block Block, err error) {
+	var u *url.URL
+	ustr := "/blocks/"
+	if height != 0 && hash != "" {
+		err = errors.New("Func GetBlockPage: Cannot send both height and hash")
+		return
+	} else if height != 0 {
+		ustr = ustr + strconv.Itoa(height)
+	} else if hash != "" {
+		ustr = ustr + hash
+	}
+	u, err = api.buildURL(ustr, params)
+	resp, err := getResponse(u)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(&block)
 	return
 }
 
@@ -45,46 +62,11 @@ func (api *API) GetBlockNextTXs(this Block) (next Block, err error) {
 	if err != nil {
 		return
 	}
-	params := txurl.Query()
-	txstart, err := strconv.Atoi(params.Get("txstart"))
-	limit, err := strconv.Atoi(params.Get("limit"))
-	if err != nil {
-		return
+	params := make(map[string]string)
+	query := txurl.Query()
+	for k := range query {
+		params[k] = query.Get(k)
 	}
-	next, err = api.GetBlockPage(0, this.Hash, txstart, limit)
-	return
-}
-
-//GetBlockPage returns a Block based on either height
-//or hash, and includes custom variables for txstart/limit of txs.
-//If both height and hash are sent, it will throw an error. If txstart/limit = 0,
-//it will use the API-defaults for both.
-func (api *API) GetBlockPage(height int, hash string, txstart int, limit int) (block Block, err error) {
-	var u *url.URL
-	ustr := "/blocks/"
-	if height != 0 && hash != "" {
-		err = errors.New("Func GetBlockPage: Cannot send both height and hash")
-		return
-	} else if height != 0 {
-		ustr = ustr + strconv.Itoa(height)
-	} else if hash != "" {
-		ustr = ustr + hash
-	}
-	if txstart == 0 && limit == 0 {
-		u, err = api.buildURL(ustr)
-	} else {
-		params := map[string]string{
-			"txstart": strconv.Itoa(txstart),
-			"limit":   strconv.Itoa(limit),
-		}
-		u, err = api.buildURLParams(ustr, params)
-	}
-	resp, err := getResponse(u)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&block)
+	next, err = api.GetBlock(0, this.Hash, params)
 	return
 }
