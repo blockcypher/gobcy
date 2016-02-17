@@ -137,10 +137,6 @@ func (api *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
 		err = errors.New("Faucet: Cannot use Faucet unless on BlockCypher Testnet or Bitcoin Testnet3.")
 		return
 	}
-	if amount > 1e7 {
-		err = errors.New("Faucet: Cannot fund with more than 10,000,000 coins at a time.")
-		return
-	}
 	u, err := api.buildURL("/faucet", nil)
 	if err != nil {
 		return
