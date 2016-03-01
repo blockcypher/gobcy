@@ -1,8 +1,6 @@
 package gobcy
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"strconv"
 )
@@ -12,14 +10,10 @@ import (
 //include transaction details.
 func (api *API) GetAddrBal(hash string, params map[string]string) (addr Addr, err error) {
 	u, err := api.buildURL("/addrs/"+hash+"/balance", params)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	//decode JSON into Addr
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&addr)
+	err = getResponse(u, &addr)
 	return
 }
 
@@ -30,13 +24,10 @@ func (api *API) GetAddrBal(hash string, params map[string]string) (addr Addr, er
 //slightly slower.
 func (api *API) GetAddr(hash string, params map[string]string) (addr Addr, err error) {
 	u, err := api.buildURL("/addrs/"+hash, params)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&addr)
+	err = getResponse(u, &addr)
 	return
 }
 
@@ -59,14 +50,10 @@ func (api *API) GetAddrNext(this Addr) (next Addr, err error) {
 //it includes full transactions, but slowest Address query.
 func (api *API) GetAddrFull(hash string, params map[string]string) (addr Addr, err error) {
 	u, err := api.buildURL("/addrs/"+hash+"/full", params)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	//decode JSON into Addr
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&addr)
+	err = getResponse(u, &addr)
 	return
 }
 
@@ -79,7 +66,7 @@ func (api *API) GetAddrFullNext(this Addr) (next Addr, err error) {
 		return
 	}
 	before := this.TXs[len(this.TXs)-1].BlockHeight
-	next, err = api.GetAddr(this.Address, map[string]string{"before": strconv.Itoa(before)})
+	next, err = api.GetAddrFull(this.Address, map[string]string{"before": strconv.Itoa(before)})
 	return
 }
 
@@ -89,14 +76,10 @@ func (api *API) GetAddrFullNext(this Addr) (next Addr, err error) {
 //large amounts in these addresses, or for very long.
 func (api *API) GenAddrKeychain() (pair AddrKeychain, err error) {
 	u, err := api.buildURL("/addrs", nil)
-	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	//decode JSON into AddrKeychain
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&pair)
+	err = postResponse(u, nil, &pair)
 	return
 }
 
@@ -114,18 +97,7 @@ func (api *API) GenAddrMultisig(multi AddrKeychain) (addr AddrKeychain, err erro
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&multi); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&addr)
+	err = postResponse(u, &multi, &addr)
 	return
 }
 
@@ -152,20 +124,8 @@ func (api *API) Faucet(a AddrKeychain, amount int) (txhash string, err error) {
 	} else {
 		addr = a.Address
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&FauxAddr{addr, amount}); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	//decode JSON into map[string]string
 	txref := make(map[string]string)
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&txref)
+	err = postResponse(u, &FauxAddr{addr, amount}, &txref)
 	txhash = txref["tx_ref"]
 	return
 }

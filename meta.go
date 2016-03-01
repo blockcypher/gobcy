@@ -1,8 +1,6 @@
 package gobcy
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -24,14 +22,10 @@ func (api *API) GetMeta(hash string, kind string, private bool) (meta map[string
 	}
 	params := map[string]string{"private": strconv.FormatBool(private)}
 	u, err := api.buildURL("/"+kind+"s/"+hash+"/meta", params)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	//decode JSON into map[string]string
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&meta)
+	err = getResponse(u, &meta)
 	return
 }
 
@@ -54,16 +48,7 @@ func (api *API) PutMeta(hash string, kind string, private bool, meta map[string]
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&meta); err != nil {
-		return
-	}
-	resp, err := putResponse(u, &data)
-	if err != nil {
-		return
-	}
-	resp.Body.Close()
+	err = putResponse(u, &meta)
 	return
 }
 
@@ -80,10 +65,9 @@ func (api *API) DeleteMeta(hash string, kind string) (err error) {
 		return
 	}
 	u, err := api.buildURL("/"+kind+"s/"+hash+"/meta", nil)
-	resp, err := deleteResponse(u)
 	if err != nil {
 		return
 	}
-	resp.Body.Close()
+	err = deleteResponse(u)
 	return
 }

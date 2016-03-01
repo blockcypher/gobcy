@@ -1,9 +1,7 @@
 package gobcy
 
 import (
-	"bytes"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -21,18 +19,7 @@ func (api *API) SendMicro(mic MicroTX) (result MicroTX, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&mic); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&result)
+	err = postResponse(u, &mic, &result)
 	return
 }
 

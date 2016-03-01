@@ -11,11 +11,13 @@
 package gobcy
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 const baseURL = "https://api.blockcypher.com/v1/"
@@ -35,73 +37,120 @@ type API struct {
 }
 
 //getResponse is a boilerplate for HTTP GET responses.
-func getResponse(target *url.URL) (resp *http.Response, err error) {
-	resp, err = http.Get(target.String())
+func getResponse(target *url.URL, decTarget interface{}) (err error) {
+	resp, err := http.Get(target.String())
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//copy resp.Body for error handling
+	var errCopy bytes.Buffer
+	decCopy := io.TeeReader(resp.Body, &errCopy)
+	dec := json.NewDecoder(decCopy)
+	err = dec.Decode(decTarget)
 	if err != nil {
 		return
 	}
 	if resp.StatusCode != http.StatusOK {
-		msg := make(map[string]string)
-		dec := json.NewDecoder(resp.Body)
-		dec.Decode(&msg)
-		resp.Body.Close()
-		err = errors.New(resp.Status + ", Message: " + msg["error"])
+		err = respErrorMaker(resp.StatusCode, &errCopy)
 	}
 	return
 }
 
 //postResponse is a boilerplate for HTTP POST responses.
-func postResponse(target *url.URL, data io.Reader) (resp *http.Response, err error) {
-	resp, err = http.Post(target.String(), "application/json", data)
+func postResponse(target *url.URL, encTarget interface{}, decTarget interface{}) (err error) {
+	var data bytes.Buffer
+	enc := json.NewEncoder(&data)
+	if err = enc.Encode(encTarget); err != nil {
+		return
+	}
+	resp, err := http.Post(target.String(), "application/json", &data)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+	//copy resp.Body for error handling
+	var errCopy bytes.Buffer
+	decCopy := io.TeeReader(resp.Body, &errCopy)
+	dec := json.NewDecoder(decCopy)
+	err = dec.Decode(decTarget)
 	if err != nil {
 		return
 	}
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		msg := make(map[string]string)
-		dec := json.NewDecoder(resp.Body)
-		dec.Decode(&msg)
-		resp.Body.Close()
-		err = errors.New(resp.Status + ", Message: " + msg["error"])
+		err = respErrorMaker(resp.StatusCode, &errCopy)
 	}
 	return
 }
 
 //putResponse is a boilerplate for HTTP PUT responses.
-func putResponse(target *url.URL, data io.Reader) (resp *http.Response, err error) {
-	req, err := http.NewRequest("PUT", target.String(), data)
+func putResponse(target *url.URL, encTarget interface{}) (err error) {
+	var data bytes.Buffer
+	enc := json.NewEncoder(&data)
+	if err = enc.Encode(encTarget); err != nil {
+		return
+	}
+	req, err := http.NewRequest("PUT", target.String(), &data)
 	if err != nil {
 		return
 	}
-	resp, err = http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-		msg := make(map[string]string)
-		dec := json.NewDecoder(resp.Body)
-		dec.Decode(&msg)
-		resp.Body.Close()
-		err = errors.New(resp.Status + ", Message: " + msg["error"])
+		err = respErrorMaker(resp.StatusCode, resp.Body)
 	}
 	return
 }
 
 //deleteResponse is a boilerplate for HTTP DELETE responses.
-func deleteResponse(target *url.URL) (resp *http.Response, err error) {
+func deleteResponse(target *url.URL) (err error) {
 	req, err := http.NewRequest("DELETE", target.String(), nil)
 	if err != nil {
 		return
 	}
-	resp, err = http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusNoContent {
-		msg := make(map[string]string)
-		dec := json.NewDecoder(resp.Body)
-		dec.Decode(&msg)
-		resp.Body.Close()
-		err = errors.New(resp.Status + ", Message: " + msg["error"])
+		err = respErrorMaker(resp.StatusCode, resp.Body)
+	}
+	return
+}
+
+//respErrorMaker checks error messages/if they are multiple errors
+//serializes them into a single error message
+func respErrorMaker(statusCode int, body io.Reader) (err error) {
+	status := "HTTP " + strconv.Itoa(statusCode) + " " + http.StatusText(statusCode)
+	type errorJSON struct {
+		Err    string `json:"error"`
+		Errors []struct {
+			Err string `json:"error"`
+		} `json:"errors"`
+	}
+	var msg errorJSON
+	dec := json.NewDecoder(body)
+	err = dec.Decode(&msg)
+	if err != nil {
+		return err
+	}
+	var errtxt string
+	errtxt += msg.Err
+	for i, v := range msg.Errors {
+		if i == len(msg.Errors)-1 {
+			errtxt += v.Err
+		} else {
+			errtxt += v.Err + ", "
+		}
+	}
+	if errtxt == "" {
+		err = errors.New(status)
+	} else {
+		err = errors.New(status + ", Message(s): " + errtxt)
 	}
 	return
 }
@@ -128,12 +177,9 @@ func (api *API) buildURL(u string, params map[string]string) (target *url.URL, e
 //checks token usage
 func (api *API) CheckUsage() (usage TokenUsage, err error) {
 	u, err := url.Parse(baseURL + "tokens/" + api.Token)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&usage)
+	err = getResponse(u, &usage)
 	return
 }

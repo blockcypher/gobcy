@@ -1,10 +1,5 @@
 package gobcy
 
-import (
-	"bytes"
-	"encoding/json"
-)
-
 //CreatePayFwd creates a new PayFwd forwarding
 //request associated with your API.Token, and
 //returns a PayFwd with a BlockCypher-assigned id.
@@ -13,18 +8,7 @@ func (api *API) CreatePayFwd(payment PayFwd) (result PayFwd, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&payment); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&result)
+	err = postResponse(u, &payment, &result)
 	return
 }
 
@@ -32,28 +16,20 @@ func (api *API) CreatePayFwd(payment PayFwd) (result PayFwd, err error) {
 //associated with your API.Token.
 func (api *API) ListPayFwds() (payments []PayFwd, err error) {
 	u, err := api.buildURL("/payments", nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	//decode JSON into payments
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&payments)
+	err = getResponse(u, &payments)
 	return
 }
 
 //GetPayFwd returns a PayFwd based on its id.
 func (api *API) GetPayFwd(id string) (payment PayFwd, err error) {
 	u, err := api.buildURL("/payments/"+id, nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	//decode JSON into payments
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&payment)
+	err = getResponse(u, &payment)
 	return
 }
 
@@ -61,10 +37,9 @@ func (api *API) GetPayFwd(id string) (payment PayFwd, err error) {
 //BlockCypher's database, based on its id.
 func (api *API) DeletePayFwd(id string) (err error) {
 	u, err := api.buildURL("/payments/"+id, nil)
-	resp, err := deleteResponse(u)
 	if err != nil {
 		return
 	}
-	resp.Body.Close()
+	err = deleteResponse(u)
 	return
 }

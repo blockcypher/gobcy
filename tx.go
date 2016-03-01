@@ -1,9 +1,7 @@
 package gobcy
 
 import (
-	"bytes"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"strconv"
 
@@ -13,13 +11,10 @@ import (
 //GetUnTX returns an array of the latest unconfirmed TXs.
 func (api *API) GetUnTX() (txs []TX, err error) {
 	u, err := api.buildURL("/txs", nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&txs)
+	err = getResponse(u, &txs)
 	return
 }
 
@@ -27,13 +22,10 @@ func (api *API) GetUnTX() (txs []TX, err error) {
 //an optionally-nil URL parameter map.
 func (api *API) GetTX(hash string, params map[string]string) (tx TX, err error) {
 	u, err := api.buildURL("/txs/"+hash, params)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&tx)
+	err = getResponse(u, &tx)
 	return
 }
 
@@ -43,13 +35,10 @@ func (api *API) GetTX(hash string, params map[string]string) (tx TX, err error) 
 //the transaction has already been confirmed.
 func (api *API) GetTXConf(hash string) (conf TXConf, err error) {
 	u, err := api.buildURL("/txs/"+hash+"/confidence", nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&conf)
+	err = getResponse(u, &conf)
 	return
 }
 
@@ -114,18 +103,7 @@ func (api *API) NewTX(trans TX, verify bool) (skel TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&trans); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&skel)
+	err = postResponse(u, &trans, &skel)
 	return
 }
 
@@ -169,18 +147,7 @@ func (api *API) SendTX(skel TXSkel) (trans TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&skel); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&trans)
+	err = postResponse(u, &skel, &trans)
 	return
 }
 
@@ -191,18 +158,7 @@ func (api *API) PushTX(hex string) (trans TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(map[string]string{"tx": hex}); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&trans)
+	err = postResponse(u, &map[string]string{"tx": hex}, &trans)
 	return
 }
 
@@ -214,17 +170,6 @@ func (api *API) DecodeTX(hex string) (trans TXSkel, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(map[string]string{"tx": hex}); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&trans)
+	err = postResponse(u, &map[string]string{"tx": hex}, &trans)
 	return
 }

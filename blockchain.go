@@ -1,7 +1,6 @@
 package gobcy
 
 import (
-	"encoding/json"
 	"errors"
 	"net/url"
 	"strconv"
@@ -11,13 +10,10 @@ import (
 //configured Coin/Chain.
 func (api *API) GetChain() (chain Blockchain, err error) {
 	u, err := api.buildURL("", nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&chain)
+	err = getResponse(u, &chain)
 	return
 }
 
@@ -36,13 +32,10 @@ func (api *API) GetBlock(height int, hash string, params map[string]string) (blo
 		ustr = ustr + hash
 	}
 	u, err = api.buildURL(ustr, params)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&block)
+	err = getResponse(u, &block)
 	return
 }
 

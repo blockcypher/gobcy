@@ -1,8 +1,6 @@
 package gobcy
 
 import (
-	"bytes"
-	"encoding/json"
 	"strconv"
 	"strings"
 )
@@ -18,18 +16,7 @@ func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&req); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&wal)
+	err = postResponse(u, &req, &wal)
 	return
 }
 
@@ -37,16 +24,13 @@ func (api *API) CreateWallet(req Wallet) (wal Wallet, err error) {
 //this token/coin/chain.
 func (api *API) ListWallets() (names []string, err error) {
 	u, err := api.buildURL("/wallets", nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
 	jsonResp := new(struct {
 		List []string `json:"wallet_names"`
 	})
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(jsonResp)
+	err = getResponse(u, jsonResp)
 	names = jsonResp.List
 	return
 }
@@ -56,13 +40,10 @@ func (api *API) ListWallets() (names []string, err error) {
 //not.
 func (api *API) GetWallet(name string) (wal Wallet, err error) {
 	u, err := api.buildURL("/wallets/"+name, nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&wal)
+	err = getResponse(u, &wal)
 	return
 }
 
@@ -77,18 +58,7 @@ func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal W
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&Wallet{Addresses: addrs}); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&wal)
+	err = postResponse(u, &Wallet{Addresses: addrs}, &wal)
 	return
 }
 
@@ -97,14 +67,11 @@ func (api *API) AddAddrWallet(name string, addrs []string, omitAddr bool) (wal W
 //Takes an optionally-nil URL parameter map.
 func (api *API) GetAddrWallet(name string, params map[string]string) (addrs []string, err error) {
 	u, err := api.buildURL("/wallets/"+name+"/addresses", params)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
 	var wal Wallet
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&wal)
+	err = getResponse(u, &wal)
 	addrs = wal.Addresses
 	return
 }
@@ -114,11 +81,10 @@ func (api *API) GetAddrWallet(name string, params map[string]string) (addrs []st
 func (api *API) DeleteAddrWallet(name string, addrs []string) (err error) {
 	u, err := api.buildURL("/wallets/"+name+"/addresses",
 		map[string]string{"address": strings.Join(addrs, ";")})
-	resp, err := deleteResponse(u)
 	if err != nil {
 		return
 	}
-	resp.Body.Close()
+	err = deleteResponse(u)
 	return
 }
 
@@ -127,14 +93,10 @@ func (api *API) DeleteAddrWallet(name string, addrs []string) (err error) {
 //private/WIF/public key of address via an Address Keychain.
 func (api *API) GenAddrWallet(name string) (wal Wallet, addr AddrKeychain, err error) {
 	u, err := api.buildURL("/wallets/"+name+"/addresses/generate", nil)
-	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	//weird anonymous struct composition FTW
-	err = dec.Decode(&struct {
+	err = postResponse(u, nil, &struct {
 		*Wallet
 		*AddrKeychain
 	}{&wal, &addr})
@@ -145,10 +107,9 @@ func (api *API) GenAddrWallet(name string) (wal Wallet, addr AddrKeychain, err e
 //API token/coin/chain.
 func (api *API) DeleteWallet(name string) (err error) {
 	u, err := api.buildURL("/wallets/"+name, nil)
-	resp, err := deleteResponse(u)
 	if err != nil {
 		return
 	}
-	resp.Body.Close()
+	err = deleteResponse(u)
 	return
 }

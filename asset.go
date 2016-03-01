@@ -1,21 +1,13 @@
 package gobcy
 
-import (
-	"bytes"
-	"encoding/json"
-)
-
 //GenAssetKeychain generates a public/private key pair, alongside
 //an associated OAPAddress for use in the Asset API.
 func (api *API) GenAssetKeychain() (pair AddrKeychain, err error) {
 	u, err := api.buildURL("/oap/addrs", nil)
-	resp, err := postResponse(u, nil)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&pair)
+	err = postResponse(u, nil, &pair)
 	return
 }
 
@@ -27,18 +19,7 @@ func (api *API) IssueAsset(issue OAPIssue) (tx OAPTX, err error) {
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&issue); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&tx)
+	err = postResponse(u, &issue, &tx)
 	return
 }
 
@@ -49,18 +30,7 @@ func (api *API) TransferAsset(issue OAPIssue, assetID string) (tx OAPTX, err err
 	if err != nil {
 		return
 	}
-	var data bytes.Buffer
-	enc := json.NewEncoder(&data)
-	if err = enc.Encode(&issue); err != nil {
-		return
-	}
-	resp, err := postResponse(u, &data)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&tx)
+	err = postResponse(u, &issue, &tx)
 	return
 }
 
@@ -68,13 +38,10 @@ func (api *API) TransferAsset(issue OAPIssue, assetID string) (tx OAPTX, err err
 //with the given assetID.
 func (api *API) ListAssetTXs(assetID string) (txs []string, err error) {
 	u, err := api.buildURL("/oap/"+assetID+"/txs", nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&txs)
+	err = getResponse(u, &txs)
 	return
 }
 
@@ -82,13 +49,10 @@ func (api *API) ListAssetTXs(assetID string) (txs []string, err error) {
 //assetID and transaction hash.
 func (api *API) GetAssetTX(assetID, hash string) (tx OAPTX, err error) {
 	u, err := api.buildURL("/oap/"+assetID+"/txs/"+hash, nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&tx)
+	err = getResponse(u, &tx)
 	return
 }
 
@@ -98,12 +62,9 @@ func (api *API) GetAssetTX(assetID, hash string) (tx OAPTX, err error) {
 //"amount of asset."
 func (api *API) GetAssetAddr(assetID, oapAddr string) (addr Addr, err error) {
 	u, err := api.buildURL("/oap/"+assetID+"/addrs/"+oapAddr, nil)
-	resp, err := getResponse(u)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	dec := json.NewDecoder(resp.Body)
-	err = dec.Decode(&addr)
+	err = getResponse(u, &addr)
 	return
 }
