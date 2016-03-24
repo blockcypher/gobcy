@@ -12,6 +12,7 @@ type TokenUsage struct {
 type Usage struct {
 	PerSec       int `json:"api/second"`
 	PerHour      int `json:"api/hour"`
+	PerDay       int `json:"api/day"`
 	HooksPerHour int `json:"hooks/hour"`
 	ConfPerDay   int `json:"confidence/day"`
 	Hooks        int `json:"hooks"`
