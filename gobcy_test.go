@@ -19,7 +19,7 @@ func TestMain(m *testing.M) {
 	bcy.Coin = "bcy"
 	bcy.Chain = "test"
 	//Set Your Token
-	bcy.Token = "test-token"
+	bcy.Token = TESTTOKEN
 	//Create/fund the test addresses
 	var err error
 	keys1, err = bcy.GenAddrKeychain()
