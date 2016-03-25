@@ -10,13 +10,13 @@ type TokenUsage struct {
 }
 
 type Usage struct {
-	PerSec       int `json:"api/second"`
-	PerHour      int `json:"api/hour"`
-	PerDay       int `json:"api/day"`
-	HooksPerHour int `json:"hooks/hour"`
-	ConfPerDay   int `json:"confidence/day"`
-	Hooks        int `json:"hooks"`
-	PayFwds      int `json:"payments"`
+	PerSec       int `json:"api/second,omitempty"`
+	PerHour      int `json:"api/hour,omitempty"`
+	PerDay       int `json:"api/day,omitempty"`
+	HooksPerHour int `json:"hooks/hour,omitempty"`
+	ConfPerDay   int `json:"confidence/day,omitempty"`
+	Hooks        int `json:"hooks,omitempty"`
+	PayFwds      int `json:"payments,omitempty"`
 }
 
 //Blockchain represents information about
