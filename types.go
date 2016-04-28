@@ -5,20 +5,24 @@ import "time"
 //TokenUsage represents information about
 //the limits and usage against your token.
 type TokenUsage struct {
-	Limits      Usage   `json:"limits"`
-	Hits        Usage   `json:"hits"`
-	HitsHistory []Usage `json:"hits_history"`
+	Limits      Usage          `json:"limits"`
+	Hits        Usage          `json:"hits"`
+	HitsHistory []UsageHistory `json:"hits_history"`
 }
 
 type Usage struct {
-	PerSec       int       `json:"api/second,omitempty"`
-	PerHour      int       `json:"api/hour,omitempty"`
-	PerDay       int       `json:"api/day,omitempty"`
-	HooksPerHour int       `json:"hooks/hour,omitempty"`
-	ConfPerDay   int       `json:"confidence/day,omitempty"`
-	Hooks        int       `json:"hooks,omitempty"`
-	PayFwds      int       `json:"payments,omitempty"`
-	Time         time.Time `json:"time,omitempty"`
+	PerSec       int `json:"api/second,omitempty"`
+	PerHour      int `json:"api/hour,omitempty"`
+	PerDay       int `json:"api/day,omitempty"`
+	HooksPerHour int `json:"hooks/hour,omitempty"`
+	ConfPerDay   int `json:"confidence/day,omitempty"`
+	Hooks        int `json:"hooks,omitempty"`
+	PayFwds      int `json:"payments,omitempty"`
+}
+
+type UsageHistory struct {
+	Usage
+	Time time.Time `json:",omitempty"`
 }
 
 //Blockchain represents information about
