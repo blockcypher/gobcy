@@ -15,7 +15,7 @@ type Usage struct {
 	PerHour      int `json:"api/hour,omitempty"`
 	PerDay       int `json:"api/day,omitempty"`
 	HooksPerHour int `json:"hooks/hour,omitempty"`
-	ConfPerDay   int `json:"confidence/day,omitempty"`
+	ConfPerHour  int `json:"confidence/hour,omitempty"`
 	Hooks        int `json:"hooks,omitempty"`
 	PayFwds      int `json:"payments,omitempty"`
 }
