@@ -43,17 +43,12 @@ func getResponse(target *url.URL, decTarget interface{}) (err error) {
 		return
 	}
 	defer resp.Body.Close()
-	//copy resp.Body for error handling
-	var errCopy bytes.Buffer
-	decCopy := io.TeeReader(resp.Body, &errCopy)
-	dec := json.NewDecoder(decCopy)
-	err = dec.Decode(decTarget)
-	if err != nil {
+	if resp.StatusCode != http.StatusOK {
+		err = respErrorMaker(resp.StatusCode, resp.Body)
 		return
 	}
-	if resp.StatusCode != http.StatusOK {
-		err = respErrorMaker(resp.StatusCode, &errCopy)
-	}
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(decTarget)
 	return
 }
 
@@ -69,17 +64,12 @@ func postResponse(target *url.URL, encTarget interface{}, decTarget interface{})
 		return
 	}
 	defer resp.Body.Close()
-	//copy resp.Body for error handling
-	var errCopy bytes.Buffer
-	decCopy := io.TeeReader(resp.Body, &errCopy)
-	dec := json.NewDecoder(decCopy)
-	err = dec.Decode(decTarget)
-	if err != nil {
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		err = respErrorMaker(resp.StatusCode, resp.Body)
 		return
 	}
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		err = respErrorMaker(resp.StatusCode, &errCopy)
-	}
+	dec := json.NewDecoder(resp.Body)
+	err = dec.Decode(decTarget)
 	return
 }
 
@@ -126,6 +116,10 @@ func deleteResponse(target *url.URL) (err error) {
 //serializes them into a single error message
 func respErrorMaker(statusCode int, body io.Reader) (err error) {
 	status := "HTTP " + strconv.Itoa(statusCode) + " " + http.StatusText(statusCode)
+	if statusCode == 429 {
+		err = errors.New(status)
+		return
+	}
 	type errorJSON struct {
 		Err    string `json:"error"`
 		Errors []struct {
