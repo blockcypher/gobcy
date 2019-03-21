@@ -14,7 +14,7 @@ Then initiate an API struct with your credentials:
 
 ```go
 //explicitly
-bc := gobcy.API
+bc := gobcy.API{}
 bc.Token = "your-api-token-here"
 bc.Coin = "btc" //options: "btc","bcy","ltc","doge"
 bc.Chain = "main" //depending on coin: "main","test3","test"
