@@ -1,6 +1,6 @@
 # gobcy
 
-A Go wrapper for the [BlockCypher](http://www.blockcypher.com/) API. Targeting support for Bitcoin (main and testnet3) and BlockCypher's internal testnet, but others (Litecoin, Dogecoin) should work too.
+A Go wrapper for the [BlockCypher](http://www.blockcypher.com/) API. Targeting support for Bitcoin (main and testnet3) and BlockCypher's internal testnet, but others (Litecoin, Dogecoin) should work too. The wrapper works also for some query for Ethereum but the compatibility is not fully guaranteed.
 
 ## Configuration
 
@@ -16,7 +16,7 @@ Then initiate an API struct with your credentials:
 //explicitly
 bc := gobcy.API{}
 bc.Token = "your-api-token-here"
-bc.Coin = "btc" //options: "btc","bcy","ltc","doge"
+bc.Coin = "btc" //options: "btc","bcy","ltc","doge","eth"
 bc.Chain = "main" //depending on coin: "main","test3","test"
 
 //using a struct literal
