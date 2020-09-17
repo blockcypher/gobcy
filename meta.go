@@ -1,7 +1,6 @@
 package gobcy
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 )
@@ -17,7 +16,7 @@ import (
 //associated with your token.
 func (api *API) GetMeta(hash string, kind string, private bool) (meta map[string]string, err error) {
 	if kind != "addr" && kind != "tx" && kind != "block" {
-		err = errors.New(fmt.Sprintf("Func GetMeta: kind an invalid type: '%v'. Needs to be 'addr', 'tx', or 'block'", kind))
+		err = fmt.Errorf("Func GetMeta: kind an invalid type: '%v'. Needs to be 'addr', 'tx', or 'block'", kind)
 		return
 	}
 	params := map[string]string{"private": strconv.FormatBool(private)}
@@ -40,7 +39,7 @@ func (api *API) GetMeta(hash string, kind string, private bool) (meta map[string
 //associated with your token.
 func (api *API) PutMeta(hash string, kind string, private bool, meta map[string]string) (err error) {
 	if kind != "addr" && kind != "tx" && kind != "block" {
-		err = errors.New(fmt.Sprintf("Func PutMeta: kind an invalid type: '%v'. Needs to be 'addr', 'tx', or 'block'", kind))
+		err = fmt.Errorf("Func PutMeta: kind an invalid type: '%v'. Needs to be 'addr', 'tx', or 'block'", kind)
 		return
 	}
 	params := map[string]string{"private": strconv.FormatBool(private)}
@@ -61,7 +60,7 @@ func (api *API) PutMeta(hash string, kind string, private bool, meta map[string]
 //Public metadata cannot be deleted; it is immutable.
 func (api *API) DeleteMeta(hash string, kind string) (err error) {
 	if kind != "addr" && kind != "tx" && kind != "block" {
-		err = errors.New(fmt.Sprintf("Func DeleteMeta: kind an invalid type: '%v'. Needs to be 'addr', 'tx', or 'block'", kind))
+		err = fmt.Errorf("Func DeleteMeta: kind an invalid type: '%v'. Needs to be 'addr', 'tx', or 'block'", kind)
 		return
 	}
 	u, err := api.buildURL("/"+kind+"s/"+hash+"/meta", nil)

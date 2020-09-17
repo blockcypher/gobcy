@@ -1,5 +1,3 @@
-** This an update clone of gobcy. The mainly changes is replace the balance related fileds data type from `int` to `bit.Int`. The original implementation will be broken is product environment which is pretty obviously. **
-
 # gobcy
 
 A Go wrapper for the [BlockCypher](http://www.blockcypher.com/) API. Targeting support for Bitcoin (main and testnet3) and BlockCypher's internal testnet, but others (Litecoin, Dogecoin) should work too.
@@ -38,4 +36,3 @@ Speaking of API docs, you can check out [BlockCypher's documentation here](http:
 ## Testing
 
 The aforementioned `gobcy_test.go` file contains a number of tests to ensure the wrapper is functioning properly. If you run it yourself, you'll have to insert a valid API token; you may also want to generate a new token, as the test POSTs and DELETEs WebHooks and Payment Forwarding requests.
-

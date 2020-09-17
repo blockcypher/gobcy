@@ -1,7 +1,9 @@
 package gobcy
 
-import "time"
-import "math/big"
+import (
+	"math/big"
+	"time"
+)
 
 //TokenUsage represents information about
 //the limits and usage against your token.
@@ -11,6 +13,7 @@ type TokenUsage struct {
 	HitsHistory []UsageHistory `json:"hits_history"`
 }
 
+// Usage defines the usage of the token
 type Usage struct {
 	PerSec       int `json:"api/second,omitempty"`
 	PerHour      int `json:"api/hour,omitempty"`
@@ -21,6 +24,7 @@ type Usage struct {
 	PayFwds      int `json:"payments,omitempty"`
 }
 
+// UsageHistory defines the usage over time
 type UsageHistory struct {
 	Usage
 	Time time.Time `json:",omitempty"`
