@@ -3,6 +3,7 @@ package gobcy
 import (
 	"encoding/hex"
 	"errors"
+	"math/big"
 	"strconv"
 
 	"github.com/btcsuite/btcd/btcec"
@@ -44,7 +45,7 @@ func (api *API) GetTXConf(hash string) (conf TXConf, err error) {
 
 //TempNewTX creates a simple template transaction, suitable for
 //use in NewTX. Takes an input/output address and amount.
-func TempNewTX(inAddr string, outAddr string, amount int) (trans TX) {
+func TempNewTX(inAddr string, outAddr string, amount big.Int) (trans TX) {
 	trans.Inputs = make([]TXInput, 1)
 	trans.Outputs = make([]TXOutput, 1)
 	trans.Inputs[0].Addresses = make([]string, 1)
@@ -62,7 +63,7 @@ func TempNewTX(inAddr string, outAddr string, amount int) (trans TX) {
 //send from a multisig address (/series of public keys).
 //n represents the number of valid signatures required, and m
 //is derived from the number of pubkeys.
-func TempMultiTX(inAddr string, outAddr string, amount int, n int, pubkeys []string) (trans TX, err error) {
+func TempMultiTX(inAddr string, outAddr string, amount big.Int, n int, pubkeys []string) (trans TX, err error) {
 	m := len(pubkeys)
 	if inAddr != "" && outAddr != "" {
 		err = errors.New("TempMultiTX: Can't have both inAddr and outAddr != \"\"")

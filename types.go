@@ -1,6 +1,9 @@
 package gobcy
 
-import "time"
+import (
+	"math/big"
+	"time"
+)
 
 //TokenUsage represents information about
 //the limits and usage against your token.
@@ -10,6 +13,7 @@ type TokenUsage struct {
 	HitsHistory []UsageHistory `json:"hits_history"`
 }
 
+// Usage defines the usage of the token
 type Usage struct {
 	PerSec       int `json:"api/second,omitempty"`
 	PerHour      int `json:"api/hour,omitempty"`
@@ -20,6 +24,7 @@ type Usage struct {
 	PayFwds      int `json:"payments,omitempty"`
 }
 
+// UsageHistory defines the usage over time
 type UsageHistory struct {
 	Usage
 	Time time.Time `json:",omitempty"`
@@ -49,8 +54,8 @@ type Block struct {
 	Height       int       `json:"height"`
 	Depth        int       `json:"depth"`
 	Chain        string    `json:"chain"`
-	Total        int       `json:"total"`
-	Fees         int       `json:"fees"`
+	Total        big.Int   `json:"total"`
+	Fees         big.Int   `json:"fees"`
 	Ver          int       `json:"ver"`
 	Time         time.Time `json:"time"`
 	ReceivedTime time.Time `json:"received_time"`
@@ -71,8 +76,8 @@ type TX struct {
 	BlockHeight   int        `json:"block_height,omitempty"`
 	Hash          string     `json:"hash,omitempty"`
 	Addresses     []string   `json:"addresses,omitempty"`
-	Total         int        `json:"total,omitempty"`
-	Fees          int        `json:"fees,omitempty"`
+	Total         big.Int    `json:"total,omitempty"`
+	Fees          big.Int    `json:"fees,omitempty"`
 	Size          int        `json:"size"`
 	Preference    string     `json:"preference,omitempty"`
 	RelayedBy     string     `json:"relayed_by,omitempty"`
@@ -112,7 +117,7 @@ type TXInput struct {
 //TXOutput represents the state of a transaction output
 type TXOutput struct {
 	SpentBy    string   `json:"spent_by,omitempty"`
-	Value      int      `json:"value"`
+	Value      big.Int  `json:"value"`
 	Addresses  []string `json:"addresses"`
 	ScriptType string   `json:"script_type,omitempty"`
 	Script     string   `json:"script,omitempty"`
@@ -137,7 +142,7 @@ type TXRef struct {
 	TXHash        string    `json:"tx_hash"`
 	TXInputN      int       `json:"tx_input_n"`
 	TXOutputN     int       `json:"tx_output_n"`
-	Value         int       `json:"value"`
+	Value         big.Int   `json:"value"`
 	Pref          string    `json:"preference"`
 	Spent         bool      `json:"spent"`
 	DoubleSpend   bool      `json:"double_spend"`
@@ -149,7 +154,7 @@ type TXRef struct {
 	Confirmed     time.Time `json:"confirmed,omitempty"`
 	SpentBy       string    `json:"spent_by,omitempty"`
 	Received      time.Time `json:"received,omitempty"`
-	ReceivedCount int       `json:"received_count,omitempty"`
+	ReceivedCount big.Int   `json:"received_count,omitempty"`
 }
 
 //TXSkel represents the return call to BlockCypher's
@@ -190,7 +195,7 @@ type MicroTX struct {
 	Priv       string   `json:"from_private,omitempty"`
 	Wif        string   `json:"from_wif,omitempty"`
 	ToAddr     string   `json:"to_address"`
-	Value      int      `json:"value_satoshis"`
+	Value      big.Int  `json:"value_satoshis"`
 	ChangeAddr string   `json:"change_address,omitempty"`
 	Wait       bool     `json:"wait_guarantee,omitempty"`
 	ToSign     []string `json:"tosign,omitempty"`
@@ -201,8 +206,8 @@ type MicroTX struct {
 		OutputIndex int    `json:"output_index"`
 	} `json:"inputs,omitempty"`
 	Outputs []struct {
-		Value   int    `json:"value"`
-		Address string `json:"address"`
+		Value   big.Int `json:"value"`
+		Address string  `json:"address"`
 	} `json:"outputs,omitempty"`
 	Fees int `json:"fees,omitempty"`
 }
@@ -213,11 +218,11 @@ type Addr struct {
 	Address            string   `json:"address,omitempty"`
 	Wallet             Wallet   `json:"wallet,omitempty"`
 	HDWallet           HDWallet `json:"hd_wallet,omitempty"`
-	TotalReceived      int      `json:"total_received"`
-	TotalSent          int      `json:"total_sent"`
-	Balance            int      `json:"balance"`
-	UnconfirmedBalance int      `json:"unconfirmed_balance"`
-	FinalBalance       int      `json:"final_balance"`
+	TotalReceived      big.Int  `json:"total_received"`
+	TotalSent          big.Int  `json:"total_sent"`
+	Balance            big.Int  `json:"balance"`
+	UnconfirmedBalance big.Int  `json:"unconfirmed_balance"`
+	FinalBalance       big.Int  `json:"final_balance"`
 	NumTX              int      `json:"n_tx"`
 	UnconfirmedNumTX   int      `json:"unconfirmed_n_tx"`
 	FinalNumTX         int      `json:"final_n_tx"`
@@ -301,7 +306,7 @@ type PayFwd struct {
 	InputAddr      string   `json:"input_address,omitempty"`
 	ProcessAddr    string   `json:"process_fees_address,omitempty"`
 	ProcessPercent float64  `json:"process_fees_percent,omitempty"`
-	ProcessValue   int      `json:"process_fees_satoshis,omitempty"`
+	ProcessValue   big.Int  `json:"process_fees_satoshis,omitempty"`
 	CallbackURL    string   `json:"callback_url,omitempty"`
 	EnableConfirm  bool     `json:"enable_confirmations,omitempty"`
 	MiningFees     int      `json:"mining_fees_satoshis,omitempty"`
@@ -311,20 +316,20 @@ type PayFwd struct {
 //Payback represents a Payment Forwarding Callback.
 //It's more fun to call it a "payback."
 type Payback struct {
-	Value       int    `json:"value"`
-	Destination string `json:"destination"`
-	DestHash    string `json:"transaction_hash"`
-	InputAddr   string `json:"input_address"`
-	InputHash   string `json:"input_transaction_hash"`
+	Value       big.Int `json:"value"`
+	Destination string  `json:"destination"`
+	DestHash    string  `json:"transaction_hash"`
+	InputAddr   string  `json:"input_address"`
+	InputHash   string  `json:"input_transaction_hash"`
 }
 
 //OAPIssue represents a request for issuance or transfer of
 //an Open Asset on a blockchain.
 type OAPIssue struct {
-	Priv     string `json:"from_private"`
-	ToAddr   string `json:"to_address"`
-	Amount   int    `json:"amount"`
-	Metadata string `json:"metadata,omitempty"`
+	Priv     string  `json:"from_private"`
+	ToAddr   string  `json:"to_address"`
+	Amount   big.Int `json:"amount"`
+	Metadata string  `json:"metadata,omitempty"`
 }
 
 //OAPTX represents an Open Asset protocol transaction, generated
@@ -338,14 +343,14 @@ type OAPTX struct {
 	Metadata    string    `json:"oap_meta,omitempty"`
 	DoubleSpend bool      `json:"double_spend"`
 	Inputs      []struct {
-		PrevHash    string `json:"prev_hash"`
-		OutputIndex int    `json:"output_index"`
-		OAPAddress  string `json:"address"`
-		OutputValue int    `json:"output_value"`
+		PrevHash    string  `json:"prev_hash"`
+		OutputIndex int     `json:"output_index"`
+		OAPAddress  string  `json:"address"`
+		OutputValue big.Int `json:"output_value"`
 	} `json:"inputs"`
 	Outputs []struct {
-		OAPAddress      string `json:"address"`
-		Value           int    `json:"value"`
-		OrigOutputIndex int    `json:"original_output_index"`
+		OAPAddress      string  `json:"address"`
+		Value           big.Int `json:"value"`
+		OrigOutputIndex int     `json:"original_output_index"`
 	} `json:"outputs"`
 }

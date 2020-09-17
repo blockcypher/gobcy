@@ -5,6 +5,7 @@ package gobcy
 import (
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 	"testing"
 	"time"
@@ -19,7 +20,7 @@ func TestMain(m *testing.M) {
 	bcy.Coin = "bcy"
 	bcy.Chain = "test"
 	//Set Your Token
-	bcy.Token = TESTTOKEN
+	bcy.Token = "$TOKEN"
 	//Create/fund the test addresses
 	var err error
 	keys1, err = bcy.GenAddrKeychain()
@@ -211,7 +212,7 @@ func TestTX(t *testing.T) {
 	}
 	t.Logf("%+v\n", tx)
 	//Create New TXSkeleton
-	temp := TempNewTX(keys2.Address, keys1.Address, 45000)
+	temp := TempNewTX(keys2.Address, keys1.Address, *big.NewInt(45000))
 	skel, err := bcy.NewTX(temp, true)
 	if err != nil {
 		t.Error("NewTX error encountered: ", err)
@@ -232,13 +233,13 @@ func TestTX(t *testing.T) {
 }
 
 func TestMicro(t *testing.T) {
-	result, err := bcy.SendMicro(MicroTX{Priv: keys2.Private, ToAddr: keys1.Address, Value: 25000})
+	result, err := bcy.SendMicro(MicroTX{Priv: keys2.Private, ToAddr: keys1.Address, Value: *big.NewInt(25000)})
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", result)
 	//Test public key signing method
-	micpub, err := bcy.SendMicro(MicroTX{Pubkey: keys2.Public, ToAddr: keys1.Address, Value: 15000})
+	micpub, err := bcy.SendMicro(MicroTX{Pubkey: keys2.Public, ToAddr: keys1.Address, Value: *big.NewInt(15000)})
 	if err != nil {
 		t.Error("Error encountered: ", err)
 	}
@@ -326,7 +327,7 @@ func TestAsset(t *testing.T) {
 	if err != nil {
 		t.Error("GenAsset/AddrKeychain or Faucet error encountered: ", err)
 	}
-	tx1, err := bcy.IssueAsset(OAPIssue{funder.Private, oap1.OAPAddress, 9000, ""})
+	tx1, err := bcy.IssueAsset(OAPIssue{funder.Private, oap1.OAPAddress, *big.NewInt(9000), ""})
 	if err != nil {
 		t.Error("IssueAsset error encountered: ", err)
 	}
@@ -335,7 +336,7 @@ func TestAsset(t *testing.T) {
 	for {
 		conf, err := bcy.GetTXConf(tx1.Hash)
 		if err != nil {
-			t.Logf("Error polling for Issue Asset tx confirmation: ", err)
+			t.Log("Error polling for Issue Asset tx confirmation: ", err)
 			break
 		}
 		if conf.Confidence == 1 {
@@ -345,7 +346,7 @@ func TestAsset(t *testing.T) {
 		fmt.Printf(".")
 		time.Sleep(2 * time.Second)
 	}
-	tx2, err := bcy.TransferAsset(OAPIssue{oap1.Private, oap2.OAPAddress, 8999, ""}, tx1.AssetID)
+	tx2, err := bcy.TransferAsset(OAPIssue{oap1.Private, oap2.OAPAddress, *big.NewInt(8999), ""}, tx1.AssetID)
 	if err != nil {
 		t.Error("TransferAsset error encountered: ", err)
 		t.Errorf("Returned OAPTX1:%+v\n", tx1)

@@ -168,7 +168,7 @@ func (api *API) buildURL(u string, params map[string]string) (target *url.URL, e
 	return
 }
 
-//checks token usage
+// CheckUsage checks token usage
 func (api *API) CheckUsage() (usage TokenUsage, err error) {
 	u, err := url.Parse(baseURL + "tokens/" + api.Token)
 	if err != nil {
