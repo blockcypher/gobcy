@@ -166,7 +166,7 @@ func (api *API) PushTX(hex string) (trans TXSkel, err error) {
 //DecodeTX takes a hex-encoded transaction string
 //and decodes it into a TX object, without sending
 //it along to the Coin/Chain network.
-func (api *API) DecodeTX(hex string) (trans TXSkel, err error) {
+func (api *API) DecodeTX(hex string) (trans TX, err error) {
 	u, err := api.buildURL("/txs/decode", nil)
 	if err != nil {
 		return
