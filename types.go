@@ -56,6 +56,8 @@ type Block struct {
 	Chain        string    `json:"chain"`
 	Total        big.Int   `json:"total"`
 	Fees         big.Int   `json:"fees"`
+	Size         int       `json:"size,omitempty"`
+	VirtualSize  int       `json:"vsize,omitempty"`
 	Ver          int       `json:"ver"`
 	Time         time.Time `json:"time"`
 	ReceivedTime time.Time `json:"received_time"`
@@ -79,6 +81,7 @@ type TX struct {
 	Total         big.Int    `json:"total,omitempty"`
 	Fees          big.Int    `json:"fees,omitempty"`
 	Size          int        `json:"size"`
+	VirtualSize   int        `json:"vsize,omitempty"`
 	Preference    string     `json:"preference,omitempty"`
 	RelayedBy     string     `json:"relayed_by,omitempty"`
 	Received      time.Time  `json:"received,omitempty"`
