@@ -24,11 +24,17 @@ func TestMain(m *testing.M) {
 	//Create/fund the test addresses
 	var err error
 	keys1, err = bcy.GenAddrKeychain()
+	if err != nil {
+		log.Fatal("Error generating test addresses: ", err)
+	}
 	keys2, err = bcy.GenAddrKeychain()
 	if err != nil {
 		log.Fatal("Error generating test addresses: ", err)
 	}
 	txhash1, err = bcy.Faucet(keys1, 1e5)
+	if err != nil {
+		log.Fatal("Error funding test addresses: ", err)
+	}
 	txhash2, err = bcy.Faucet(keys2, 2e5)
 	if err != nil {
 		log.Fatal("Error funding test addresses: ", err)
@@ -44,7 +50,6 @@ func TestGetTXConf(t *testing.T) {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", conf)
-	return
 }
 
 func TestUsage(t *testing.T) {
@@ -53,7 +58,6 @@ func TestUsage(t *testing.T) {
 		t.Error("Error encountered: ", err)
 	}
 	t.Logf("%+v\n", usage)
-	return
 }
 
 func TestBlockchain(t *testing.T) {
@@ -86,7 +90,6 @@ func TestBlockchain(t *testing.T) {
 		t.Error("GetBlockNextTXs error encountered: ", err)
 	}
 	t.Logf("%+v\n", bl2)
-	return
 }
 
 func TestAddress(t *testing.T) {
@@ -105,7 +108,6 @@ func TestAddress(t *testing.T) {
 		t.Error("GetAddrFull error encountered: ", err)
 	}
 	t.Logf("%+v\n", addr)
-	return
 }
 
 func TestGenAddrMultisig(t *testing.T) {
@@ -122,7 +124,6 @@ func TestGenAddrMultisig(t *testing.T) {
 		t.Error("Response does not match expected address")
 	}
 	t.Logf("%+v\n", response)
-	return
 }
 
 func TestWallet(t *testing.T) {
@@ -162,7 +163,6 @@ func TestWallet(t *testing.T) {
 	if err != nil {
 		t.Error("DeleteWallet error encountered: ", err)
 	}
-	return
 }
 
 func TestHDWallet(t *testing.T) {
@@ -197,7 +197,6 @@ func TestHDWallet(t *testing.T) {
 	if err != nil {
 		t.Error("DeleteHDWallet error encountered: ", err)
 	}
-	return
 }
 
 func TestTX(t *testing.T) {
@@ -229,7 +228,6 @@ func TestTX(t *testing.T) {
 		t.Error("SendTX error encountered: ", err)
 	}
 	t.Logf("%+v\n", skel)
-	return
 }
 
 func TestHook(t *testing.T) {
@@ -247,7 +245,6 @@ func TestHook(t *testing.T) {
 	}
 	//Should be empty
 	t.Logf("%+v\n", hooks)
-	return
 }
 
 func TestPayFwd(t *testing.T) {
@@ -270,7 +267,6 @@ func TestPayFwd(t *testing.T) {
 	}
 	//Should be empty
 	t.Logf("%+v\n", pays)
-	return
 }
 
 func TestMeta(t *testing.T) {
@@ -293,12 +289,24 @@ func TestMeta(t *testing.T) {
 
 func TestAsset(t *testing.T) {
 	oap1, err := bcy.GenAssetKeychain()
+	if err != nil {
+		t.Error("GenAssetKeychain error encountered: ", err)
+	}
 	oap2, err := bcy.GenAssetKeychain()
+	if err != nil {
+		t.Error("GenAssetKeychain error encountered: ", err)
+	}
 	funder, err := bcy.GenAddrKeychain()
+	if err != nil {
+		t.Error("GenAddrKeychain error encountered: ", err)
+	}
 	_, err = bcy.Faucet(funder, 1e6)
+	if err != nil {
+		t.Error("GenAddrKeychain error encountered: ", err)
+	}
 	_, err = bcy.Faucet(oap1, 1e6)
 	if err != nil {
-		t.Error("GenAsset/AddrKeychain or Faucet error encountered: ", err)
+		t.Error("Faucet error encountered: ", err)
 	}
 	tx1, err := bcy.IssueAsset(OAPIssue{funder.Private, oap1.OAPAddress, *big.NewInt(9000), ""})
 	if err != nil {

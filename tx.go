@@ -123,6 +123,9 @@ func (skel *TXSkel) Sign(priv []string) (err error) {
 	//Loop through keys, append sigs/public key
 	for i, k := range priv {
 		privDat, err := hex.DecodeString(k)
+		if err != nil {
+			return err
+		}
 		tosign, err := hex.DecodeString(skel.ToSign[i])
 		if err != nil {
 			return err
