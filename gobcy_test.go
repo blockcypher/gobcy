@@ -232,33 +232,6 @@ func TestTX(t *testing.T) {
 	return
 }
 
-func TestMicro(t *testing.T) {
-	result, err := bcy.SendMicro(MicroTX{Priv: keys2.Private, ToAddr: keys1.Address, Value: *big.NewInt(25000)})
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("%+v\n", result)
-	//Test public key signing method
-	micpub, err := bcy.SendMicro(MicroTX{Pubkey: keys2.Public, ToAddr: keys1.Address, Value: *big.NewInt(15000)})
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("First MicroTX Pubkey call: %+v\n", micpub)
-	//Sign resultpub
-	err = micpub.Sign(keys2.Private)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("Signed MicroTX: %+v\n", micpub)
-	//Send signed resultpub
-	resultpub, err := bcy.SendMicro(micpub)
-	if err != nil {
-		t.Error("Error encountered: ", err)
-	}
-	t.Logf("Final MicroTX Pubkey call: %+v\n", resultpub)
-	return
-}
-
 func TestHook(t *testing.T) {
 	hook, err := bcy.CreateHook(Hook{Event: "new-block", URL: "https://my.domain.com/api/callbacks/doublespend?secret=justbetweenus"})
 	if err != nil {
