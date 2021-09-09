@@ -81,6 +81,11 @@ type TX struct {
 	Total         big.Int    `json:"total,omitempty"`
 	Fees          big.Int    `json:"fees,omitempty"`
 	Size          int        `json:"size"`
+	GasLimit      *big.Int   `json:"gas_limit,omitempty"`
+	GasUsed       *big.Int   `json:"gas_used,omitempty"`
+	GasPrice      *big.Int   `json:"gas_price,omitempty"`
+	GasTipCap     *big.Int   `json:"gas_tip_cap,omitempty"`
+	GasFeeCap     *big.Int   `json:"gas_fee_cap,omitempty"`
 	VirtualSize   int        `json:"vsize,omitempty"`
 	Preference    string     `json:"preference,omitempty"`
 	RelayedBy     string     `json:"relayed_by,omitempty"`
@@ -182,37 +187,6 @@ type NullData struct {
 	Data     string `json:"data"`
 	Encoding string `json:"encoding,omitempty"`
 	Hash     string `json:"hash,omitempty"`
-}
-
-//MicroTX represents a microtransaction. For small-value
-//transactions, BlockCypher will sign the transaction
-//on your behalf, with your private key (if provided).
-//Setting a separate change address is recommended.
-//Where your application model allows it, consider
-//only using public keys with microtransactions,
-//and sign the microtransaction with your private key
-//(without sending to BlockCypher's server).
-type MicroTX struct {
-	//Only one of Pubkey/Private/Wif is required
-	Pubkey     string   `json:"from_pubkey,omitempty"`
-	Priv       string   `json:"from_private,omitempty"`
-	Wif        string   `json:"from_wif,omitempty"`
-	ToAddr     string   `json:"to_address"`
-	Value      big.Int  `json:"value_satoshis"`
-	ChangeAddr string   `json:"change_address,omitempty"`
-	Wait       bool     `json:"wait_guarantee,omitempty"`
-	ToSign     []string `json:"tosign,omitempty"`
-	Signatures []string `json:"signatures,omitempty"`
-	Hash       string   `json:"hash,omitempty"`
-	Inputs     []struct {
-		PrevHash    string `json:"prev_hash"`
-		OutputIndex int    `json:"output_index"`
-	} `json:"inputs,omitempty"`
-	Outputs []struct {
-		Value   big.Int `json:"value"`
-		Address string  `json:"address"`
-	} `json:"outputs,omitempty"`
-	Fees int `json:"fees,omitempty"`
 }
 
 //Addr represents information about the state
