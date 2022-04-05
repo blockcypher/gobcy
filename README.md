@@ -31,7 +31,7 @@ fmt.Println(bc.GetBlock(300000,"",nil))
 
 Check the "types.go" file for information on the return types. Almost all API calls are supported, with a few dropped to reduce complexity. If an API call supports URL parameters, it will likely appear as a `params map[string]string` variable in the API method. You can check the docs for supported URL flags.
 
-Speaking of API docs, you can check out [BlockCypher's documentation here](http://dev.blockcypher.com/). We've also heavily commented the code following Golang convention, so you might also find [the GoDoc quite useful.](http://godoc.org/github.com/blockcypher/gobcy) The `gobcy_test.go` file also shows most of the API calls in action.
+Speaking of API docs, you can check out [BlockCypher's documentation here](http://blockcypher.com/dev/bitcoin). We've also heavily commented the code following Golang convention, so you might also find [the GoDoc quite useful.](http://godoc.org/github.com/blockcypher/gobcy) The `gobcy_test.go` file also shows most of the API calls in action.
 
 ## Testing
 
