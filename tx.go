@@ -6,7 +6,8 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/btcsuite/btcd/btcec"
+	"github.com/btcsuite/btcd/btcec/v2"
+	"github.com/btcsuite/btcd/btcec/v2/ecdsa"
 )
 
 //GetUnTX returns an array of the latest unconfirmed TXs.
@@ -130,10 +131,10 @@ func (skel *TXSkel) Sign(priv []string) (err error) {
 		if err != nil {
 			return err
 		}
-		privkey, pubkey := btcec.PrivKeyFromBytes(btcec.S256(), privDat)
-		sig, err := privkey.Sign(tosign)
-		if err != nil {
-			return err
+		privkey, pubkey := btcec.PrivKeyFromBytes(privDat)
+		sig := ecdsa.Sign(privkey, tosign)
+		if sig == nil {
+			return errors.New("error during signature")
 		}
 		skel.Signatures = append(skel.Signatures, hex.EncodeToString(sig.Serialize()))
 		skel.PubKeys = append(skel.PubKeys, hex.EncodeToString(pubkey.SerializeCompressed()))
