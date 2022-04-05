@@ -1,4 +1,4 @@
-module github.com/blockcypher/gobcy
+module github.com/blockcypher/gobcy/v2
 
 go 1.18
 
