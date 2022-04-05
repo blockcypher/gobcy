@@ -7,7 +7,7 @@ A Go wrapper for the [BlockCypher](http://www.blockcypher.com/) API. Targeting s
 Import the package like so:
 
 ```go
-import "github.com/blockcypher/gobcy"
+import "github.com/blockcypher/gobcy/v2"
 ```
 
 Then initiate an API struct with your credentials:
