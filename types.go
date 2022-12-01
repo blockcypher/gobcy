@@ -202,8 +202,8 @@ type Addr struct {
 	FinalBalance       big.Int  `json:"final_balance"`
 	NumTX              int      `json:"n_tx"`
 	UnconfirmedNumTX   int      `json:"unconfirmed_n_tx"`
-	Nonce              uint     `json:"nonce,omitempty"`
-	PoolNonce          uint     `json:"pool_nonce,omitempty"`
+	Nonce              uint     `json:"nonce"`
+	PoolNonce          uint     `json:"pool_nonce"`
 	FinalNumTX         int      `json:"final_n_tx"`
 	TXs                []TX     `json:"txs,omitempty"`
 	TXRefs             []TXRef  `json:"txrefs,omitempty"`
